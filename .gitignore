@@ -3,6 +3,7 @@
 
 # Python
 __pycache__/
+test_files
 *.pyc
 *.pyo
 *.pyd
