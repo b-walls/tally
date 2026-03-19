@@ -22,3 +22,28 @@ class ScanResponse(BaseModel):
     date: str
     total: float
     items: list[ScanItem]
+
+class ReceiptItemSchema(Schema): 
+    id: int
+    name: str
+    category: str
+    amount: float
+    confirmed: bool
+    
+class ReceiptSchema(Schema):
+    id: int
+    merhcant: str
+    date: str
+    total: float
+    created_at: str
+    items: list[ReceiptItemSchema]
+    
+class UpdateReceiptSchema(Schema):
+    username: str
+    category: str
+    amount: float
+    name: str
+    confirmed: bool
+    
+    class Meta:
+        fields_optional = '__all__'

@@ -22,6 +22,12 @@ class Receipt(models.Model):
     date = models.DateField(null=True)
     total = models.DecimalField(max_digits=8, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['user']),
+            models.Index(fields=['user', 'date']),
+        ]
 
 class ReceiptItem(models.Model):
     receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE)
@@ -29,6 +35,11 @@ class ReceiptItem(models.Model):
     name = models.CharField(max_length=200)
     amount = models.DecimalField(max_digits=8, decimal_places=2)
     confirmed = models.BooleanField(default=False)
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['category']),
+        ]
 
 class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

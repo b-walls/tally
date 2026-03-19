@@ -12,13 +12,15 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
+from django.shortcuts import get_object_or_404
+from django.http import FileResponse, HttpResponseForbidden
 
 from openai import AsyncOpenAI, OpenAIError
 from dotenv import load_dotenv
 from asgiref.sync import sync_to_async
 
 from .models import Category, CATEGORY_CHOICES, Receipt, ReceiptItem
-from .schema import RegisterSchema, Message, ScanItem, ScanResponse
+from .schema import *
 
 logger = logging.getLogger(__name__)
 
@@ -153,3 +155,84 @@ async def scan(request, file: File[UploadedFile]):
         return Status(500, {'message': 'An unexpected error occurred'})
     
     return Status(200, {"message": "Receipt successfully scanned"})
+
+@receipt_router.get("/{id}/image")
+def get_receipt_image(request, id: int):
+    user = request.user
+    receipt = get_object_or_404(Receipt, id=id)
+
+    # only allow the user who owns the receipt or admin/staff 
+    if not (receipt.user.id == user.id or user.is_superuser):
+        return HttpResponseForbidden
+    
+    pil_image = Image.open(receipt.image)
+    format = pil_image.format.lower()
+    pil_image.close()
+    
+    return FileResponse(receipt.image.open(), content_type=f"image/{format}")
+
+@receipt_router.get("/{id}", response={200: ReceiptSchema, 403: Message})
+def receipt_detail(request, id: int):
+    user = request.user
+    receipt = get_object_or_404(Receipt, id=id)
+
+    # only allow the user who owns the receipt or admin/staff 
+    if not (receipt.user.id == user.id or user.is_superuser):
+        return Status(403, "Forbidden")
+
+    items = ReceiptItem.objects.filter(receipt=receipt)
+    receipt_items = []
+    for item in items:
+        receipt_items.append(ReceiptItemSchema(name=item.name,
+                                         category=item.category.name,
+                                         amount=item.amount,
+                                         confirmed=item.confirmed,
+                                         id=item.id))
+    
+    receipt = ReceiptSchema(merhcant=receipt.merchant,
+                            date=receipt.date.strftime("%Y-%m-%d %H:%M:%S"),
+                            total=receipt.total,
+                            created_at=receipt.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                            items=receipt_items,
+                            id=id)
+    
+    return Status(200, receipt)
+
+
+@receipt_router.patch("/items/{id}", response={200: Message, 403: Message, 400: Message})
+def update_receipt(request, id: int, payload: UpdateReceiptSchema):
+    receipt_item = get_object_or_404(ReceiptItem, id=id)
+
+    # perm check
+    if not (request.user == receipt_item.receipt.user or request.user.is_superuser):
+        return Status(403, {"message": "Forbidden."})
+    
+    user = request.user
+    
+    # if superuser passes a username they aren't updating their own ReceiptItem
+    if user.is_superuser and payload.username is not None:
+        user = User.objects.get(username=payload.username)
+    
+    if payload.category is not None:
+        category_str = payload.category
+
+        try: 
+            category = Category.objects.get(name=category_str, user=request.user)
+        except Category.DoesNotExist:
+            return Status(400, {"message": "Category does not exist."})
+        except Category.MultipleObjectsReturned:
+            return Status(400, {"message": "Multiple categories of the same name found."})
+        
+        receipt_item.category = category
+        
+    if payload.amount is not None:
+        receipt_item.amount = payload.amount
+    
+    if payload.name is not None:
+        receipt_item.name = payload.name
+        
+    if payload.confirmed is not None:
+        receipt_item.confirmed = payload.confirmed
+        
+    receipt_item.save()
+    return Status(200, {"message": "receipt item updated"})
