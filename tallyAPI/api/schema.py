@@ -39,11 +39,18 @@ class ReceiptSchema(Schema):
     items: list[ReceiptItemSchema]
     
 class UpdateReceiptSchema(Schema):
-    username: str
+    username: str = None
+    category: str = None
+    amount: float = None
+    name: str = None
+    confirmed: bool = None
+
+class OutRemainingBudget(Schema):
+    budgets: list[RemainingBudget]
+
+class RemainingBudget(Schema):
+    id: int
     category: str
-    amount: float
-    name: str
-    confirmed: bool
-    
-    class Meta:
-        fields_optional = '__all__'
+    limit: float
+    month: str
+    remaining: float

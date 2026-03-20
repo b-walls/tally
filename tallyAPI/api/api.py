@@ -1,5 +1,7 @@
 import logging
-from datetime import datetime
+from datetime import datetime, date
+
+from collections import defaultdict
 
 import base64
 from PIL import Image
@@ -19,13 +21,14 @@ from openai import AsyncOpenAI, OpenAIError
 from dotenv import load_dotenv
 from asgiref.sync import sync_to_async
 
-from .models import Category, CATEGORY_CHOICES, Receipt, ReceiptItem
+from .models import Category, CATEGORY_CHOICES, Receipt, ReceiptItem, Budget
 from .schema import *
 
 logger = logging.getLogger(__name__)
 
 auth_router = Router()
 receipt_router = Router(auth=JWTAuth())
+budget_router = Router(auth=JWTAuth())
 
 load_dotenv()
 client = AsyncOpenAI()
@@ -108,7 +111,8 @@ async def scan(request, file: File[UploadedFile]):
     categories_str = set([category.name for category in categories])
     
     if len(categories_str) < len(CATEGORY_CHOICES):
-        categories_str.add(*CATEGORY_CHOICES)
+        for cat in CATEGORY_CHOICES:
+            categories_str.add(cat)
     
     try:
         pil_img = Image.open(file)
@@ -236,3 +240,36 @@ def update_receipt(request, id: int, payload: UpdateReceiptSchema):
         
     receipt_item.save()
     return Status(200, {"message": "receipt item updated"})
+
+@budget_router.get("/remaining", response={200: OutRemainingBudget})
+def get_remaining_budget(request, username: str | None = None):
+    user = request.user
+
+    if user.is_superuser and username is not None:
+        user = User.objects.get(username=username)
+
+    today = date.today()
+
+    receipt_items = ReceiptItem.objects.filter(receipt__user=user,
+                                              receipt__date__month=today.month,
+                                              receipt__date__year=today.year)
+    
+    budgets = Budget.objects.filter(user=user,
+                                    month__month=today.month,
+                                    month__year=today.year)
+    
+    category_spending = defaultdict(int)
+    for item in receipt_items:
+        category_spending[item.category.name] += item.amount
+    
+    results = []
+    for budget in budgets:
+        curr_category = budget.category.name
+        remaining = budget.limit - category_spending[curr_category]
+        results.append(RemainingBudget(id=budget.id,
+                                       category=curr_category,
+                                       limit=budget.limit,
+                                       month=budget.month.strftime("%Y-%m-%d %H:%M:%S"),
+                                       remaining=remaining))
+
+    return Status(200, OutRemainingBudget(budgets=results))

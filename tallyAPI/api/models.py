@@ -15,6 +15,9 @@ class Category(models.Model):
     name = models.CharField(max_length=50)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f"{self.user.username}: {self.name}"
+
 class Receipt(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to="receipts/")
@@ -28,6 +31,9 @@ class Receipt(models.Model):
             models.Index(fields=['user']),
             models.Index(fields=['user', 'date']),
         ]
+    
+    def __str__(self):
+        return f"{self.user.username} | {self.id}"
 
 class ReceiptItem(models.Model):
     receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE)
@@ -40,6 +46,9 @@ class ReceiptItem(models.Model):
         indexes = [
             models.Index(fields=['category']),
         ]
+    
+    def __str__(self):
+        return f"Item for receipt {self.receipt.id}"
 
 class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

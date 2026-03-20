@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from ninja_extra import NinjaExtraAPI
 from ninja_jwt.controller import NinjaJWTDefaultController
 
-from api.api import receipt_router, auth_router
+from api.api import receipt_router, auth_router, budget_router
 
 api = NinjaExtraAPI(
     title='Tally API',
@@ -16,6 +16,7 @@ api = NinjaExtraAPI(
 api.register_controllers(NinjaJWTDefaultController)
 api.add_router('/receipts', receipt_router)
 api.add_router('/auth', auth_router)
+api.add_router('/budget', budget_router)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
