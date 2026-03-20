@@ -45,12 +45,20 @@ class UpdateReceiptSchema(Schema):
     name: str = None
     confirmed: bool = None
 
-class OutRemainingBudget(Schema):
-    budgets: list[RemainingBudget]
-
-class RemainingBudget(Schema):
+class BudgetRemainingSchema(Schema):
     id: int
     category: str
     limit: float
     month: str
-    remaining: float
+    remaining: float = None
+
+
+class BudgetSchema(Schema):
+    id: int
+    category: str
+    limit: float
+    month: str
+
+class CategorySchema(Schema):
+    id: int
+    category: str
