@@ -7,7 +7,7 @@ from django.db import IntegrityError
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
-from api.models import Category, CATEGORY_CHOICES
+from api.models import Category, Budget, CustomUser, CATEGORY_CHOICES
 from api.schema import Message, RegisterSchema
 
 logger = logging.getLogger(__name__)
@@ -25,8 +25,13 @@ def register(request, credentials: RegisterSchema):
         user.first_name = credentials.first_name
         user.last_name = credentials.last_name
         user.save()
+
+        CustomUser.objects.create(user=user)
         for item in CATEGORY_CHOICES:
             category = Category.objects.create(name=item, user=user)
+            Budget.objects.create(user=user,
+                                  category=category,
+                                  limit=0)
 
         return Status(200, {'message': 'User created successfully'})
     except IntegrityError:

@@ -23,9 +23,9 @@ api = NinjaExtraAPI(
 
 api.register_controllers(JWTAuthController)
 api.add_router('/receipts', receipt_router)
-api.add_router('/auth', auth_router)
 api.add_router('/budget', budget_router)
 api.add_router('/category', category_router)
+api.add_router('/auth', auth_router)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

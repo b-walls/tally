@@ -37,8 +37,13 @@ class ReceiptSchema(Schema):
     total: float
     created_at: str
     items: list[ReceiptItemSchema]
-    
+
 class UpdateReceiptSchema(Schema):
+    merchant: str = None
+    date: str = None
+    total: float = None
+
+class UpdateReceiptItemSchema(Schema):
     username: str = None
     category: str = None
     amount: float = None
@@ -49,15 +54,15 @@ class BudgetRemainingSchema(Schema):
     id: int
     category: str
     limit: float
-    month: str
-    remaining: float = None
+    remaining: float
 
-
-class BudgetSchema(Schema):
+class GetBudgetSchema(Schema):
     id: int
     category: str
     limit: float
-    month: str
+
+class UpdateBudgetSchema(Schema):
+    limit: float
 
 class CategorySchema(Schema):
     id: int

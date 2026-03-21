@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 from asgiref.sync import sync_to_async
 
 from api.models import Category, CATEGORY_CHOICES, Receipt, ReceiptItem
-from api.schema import Message, ScanResponse, ReceiptSchema, ReceiptItemSchema, UpdateReceiptSchema
+from api.schema import Message, ScanResponse, ReceiptSchema, ReceiptItemSchema, UpdateReceiptItemSchema, UpdateReceiptSchema
 
 logger = logging.getLogger(__name__)
 
@@ -134,9 +134,9 @@ async def scan(request, file: File[UploadedFile]):
                                                           id=receipt_item.id))
 
         receipt_schema = ReceiptSchema(merhcant=receipt.merchant,
-                            date=receipt.date.strftime("%Y-%m-%d %H:%M:%S"),
+                            date=receipt.date.strftime("%Y-%m-%d"),
                             total=receipt.total,
-                            created_at=receipt.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                            created_at=receipt.created_at.strftime("%Y-%m-%d"),
                             items=receipt_item_schemas,
                             id=receipt.id)
 
@@ -180,17 +180,54 @@ def receipt_detail(request, id: int):
                                          id=item.id))
 
     receipt = ReceiptSchema(merhcant=receipt.merchant,
-                            date=receipt.date.strftime("%Y-%m-%d %H:%M:%S"),
+                            date=receipt.date.strftime("%Y-%m-%d"),
                             total=receipt.total,
-                            created_at=receipt.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                            created_at=receipt.created_at.strftime("%Y-%m-%d"),
                             items=receipt_items,
                             id=id)
 
     return Status(200, receipt)
 
+@receipt_router.patch("/{id}", response={200: ReceiptSchema, 403: Message, 422: Message})
+def update_receipt(request, id: int, payload: UpdateReceiptSchema):
+    user = request.user
+    receipt = get_object_or_404(Receipt, id=id)
+
+    if not (receipt.user.id == user.id or user.is_superuser):
+        return Status(403, "Forbidden")
+
+    if payload.merchant is not None:
+        receipt.merchant = payload.merchant
+
+    if payload.date is not None:
+        receipt.date = parse_receipt_date(payload.date)
+        if receipt.date == None:
+            return Status(422, {"message": "Unprocessable input"})
+
+    if payload.total is not None:
+        receipt.total = payload.total
+    
+    receipt.save()
+    items = ReceiptItem.objects.filter(receipt=receipt)
+    receipt_items = []
+    for item in items:
+        receipt_items.append(ReceiptItemSchema(name=item.name,
+                                         category=item.category.name,
+                                         amount=item.amount,
+                                         confirmed=item.confirmed,
+                                         id=item.id))
+
+    receipt = ReceiptSchema(merhcant=receipt.merchant,
+                            date=receipt.date.strftime("%Y-%m-%d"),
+                            total=receipt.total,
+                            created_at=receipt.created_at.strftime("%Y-%m-%d"),
+                            items=receipt_items,
+                            id=id)
+
+    return Status(200, receipt)
 
 @receipt_router.patch("/items/{id}", response={200: Message, 403: Message, 400: Message})
-def update_receipt(request, id: int, payload: UpdateReceiptSchema):
+def update_receipt_item(request, id: int, payload: UpdateReceiptItemSchema):
     receipt_item = get_object_or_404(ReceiptItem, id=id)
 
     if not (request.user == receipt_item.receipt.user or request.user.is_superuser):

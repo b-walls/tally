@@ -11,6 +11,15 @@ CATEGORY_CHOICES = [
     'Other',
 ]
 
+PERIOD_CHOICES = [
+    ("weekly", "Weekly"),
+    ("monthly", "Monthly"),
+]
+
+class CustomUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    budget_period = models.CharField(max_length=20, choices=PERIOD_CHOICES, default="weekly")
+
 class Category(models.Model):
     name = models.CharField(max_length=50)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -53,14 +62,12 @@ class ReceiptItem(models.Model):
 class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
-    spent = models.DecimalField(max_digits=8, decimal_places=2)
     limit = models.DecimalField(max_digits=8, decimal_places=2)
-    month = models.DateField(auto_now=False, auto_now_add=False)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'category', 'month'], 
+                fields=['user', 'category'], 
                 name='unique_budget_category_month '
             )
         ]
