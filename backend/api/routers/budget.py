@@ -3,7 +3,7 @@ from collections import defaultdict
 from datetime import date, timedelta
 
 from ninja import Router, Status
-from ninja_jwt.authentication import JWTAuth
+from api.auth import CookieAuth
 
 from django.contrib.auth.models import User
 
@@ -12,7 +12,7 @@ from api.schema import GetBudgetSchema, BudgetRemainingSchema, UpdateBudgetSchem
 
 logger = logging.getLogger(__name__)
 
-budget_router = Router(auth=JWTAuth())
+budget_router = Router(auth=CookieAuth())
 
 
 @budget_router.get("/remaining", response={200: list[BudgetRemainingSchema]})

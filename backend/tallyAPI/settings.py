@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'ninja_jwt',
+    'ninja_jwt.token_blacklist',
     'ninja_extra',
     'api',
     'storages',
@@ -60,7 +61,14 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',    
+    'http://localhost:5173',
+    'https://tally-app.vercel.app',
+]
+
+CORS_ALLOW_CREDENTIALS = True  # Required to send cookies cross-origin
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',
     'https://tally-app.vercel.app',
 ]
 
@@ -166,9 +174,8 @@ STORAGES = {
 
 MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
 
-# Ninja JWT config
+# Ninja JWT config (token lifetimes only — auth is via HttpOnly cookies)
 NINJA_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'AUTH_HEADER_TYPES': ('Bearer',),
 }

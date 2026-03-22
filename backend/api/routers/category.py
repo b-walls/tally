@@ -1,7 +1,7 @@
 import logging
 
 from ninja import Router, Status
-from ninja_jwt.authentication import JWTAuth
+from api.auth import CookieAuth
 
 from django.contrib.auth.models import User
 
@@ -10,7 +10,7 @@ from api.schema import CategorySchema
 
 logger = logging.getLogger(__name__)
 
-category_router = Router(auth=JWTAuth())
+category_router = Router(auth=CookieAuth())
 
 @category_router.get("/", response={200: list[CategorySchema]})
 def get_categories(request, username: str | None = None):

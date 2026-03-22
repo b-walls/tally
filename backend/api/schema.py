@@ -12,6 +12,10 @@ class RegisterSchema(Schema):
     password: str
     email: EmailStr
 
+class LoginSchema(Schema):
+    username: str
+    password: str
+
 class ScanItem(BaseModel):
     category: str
     name: str

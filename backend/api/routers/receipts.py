@@ -6,7 +6,7 @@ from PIL import Image
 
 from ninja import Router, Status, File
 from ninja.files import UploadedFile
-from ninja_jwt.authentication import JWTAuth
+from api.auth import CookieAuth
 
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 client = AsyncOpenAI()
 
-receipt_router = Router(auth=JWTAuth())
+receipt_router = Router(auth=CookieAuth())
 
 
 async def scan_request(categories: list[str], base64_img: str) -> ScanResponse:
