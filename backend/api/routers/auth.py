@@ -10,9 +10,9 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.http import HttpResponse
 
-from api.models import Category, Budget, CustomUser, CATEGORY_CHOICES
+from api.models import Category, Budget, UserSettings, CATEGORY_CHOICES
 from api.auth import CookieAuth, set_auth_cookies, clear_auth_cookies, REFRESH_COOKIE
-from api.schema import Message, RegisterSchema, LoginSchema
+from api.schema import Message, RegisterSchema, LoginSchema, UserSchema
 
 logger = logging.getLogger(__name__)
 
@@ -23,14 +23,15 @@ auth_router = Router()
 def register(request, credentials: RegisterSchema):
     try:
         validate_password(credentials.password)
-        user = User.objects.create_user(credentials.username,
+        user = User.objects.create_user(credentials.email,
                                         credentials.email,
                                         credentials.password)
         user.first_name = credentials.first_name
         user.last_name = credentials.last_name
         user.save()
 
-        CustomUser.objects.create(user=user)
+        UserSettings.objects.create(user=user)
+        
         for item in CATEGORY_CHOICES:
             category = Category.objects.create(name=item, user=user)
             Budget.objects.create(user=user, category=category, limit=0)
@@ -56,6 +57,11 @@ def login(request, credentials: LoginSchema):
     response["Content-Type"] = "application/json"
     response.content = b'{"message": "Login successful"}'
     return response
+
+@auth_router.get("/me", auth=CookieAuth(), response={200: UserSchema, 401: Message})
+def user_info(request):
+    user = request.auth
+    return 200, user
 
 
 @auth_router.post("/logout", auth=CookieAuth())

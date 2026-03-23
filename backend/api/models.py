@@ -16,7 +16,7 @@ PERIOD_CHOICES = [
     ("monthly", "Monthly"),
 ]
 
-class CustomUser(models.Model):
+class UserSettings(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     budget_period = models.CharField(max_length=20, choices=PERIOD_CHOICES, default="weekly")
 
@@ -35,14 +35,15 @@ class Receipt(models.Model):
     total = models.DecimalField(max_digits=8, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     
+        
+    def __str__(self):
+        return f"{self.user.username} | {self.id}"
+
     class Meta:
         indexes = [
             models.Index(fields=['user']),
             models.Index(fields=['user', 'date']),
         ]
-    
-    def __str__(self):
-        return f"{self.user.username} | {self.id}"
 
 class ReceiptItem(models.Model):
     receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE)
@@ -50,20 +51,22 @@ class ReceiptItem(models.Model):
     name = models.CharField(max_length=200)
     amount = models.DecimalField(max_digits=8, decimal_places=2)
     confirmed = models.BooleanField(default=False)
-    
+     
+    def __str__(self):
+        return f"Item for receipt {self.receipt.id}"
     class Meta:
         indexes = [
             models.Index(fields=['category']),
         ]
-    
-    def __str__(self):
-        return f"Item for receipt {self.receipt.id}"
 
 class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     limit = models.DecimalField(max_digits=8, decimal_places=2)
 
+    def __str__(self):
+        return f"{self.category.name} for {self.user.username}"
+    
     class Meta:
         constraints = [
             models.UniqueConstraint(

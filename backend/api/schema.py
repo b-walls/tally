@@ -8,7 +8,6 @@ class Message(Schema):
 class RegisterSchema(Schema):
     first_name: str
     last_name: str
-    username: str
     password: str
     email: EmailStr
 
@@ -71,3 +70,9 @@ class UpdateBudgetSchema(Schema):
 class CategorySchema(Schema):
     id: int
     category: str
+
+class UserSchema(Schema):
+    id: int
+    email: str
+    first_name: str
+    last_name: str

@@ -7,7 +7,7 @@ from api.auth import CookieAuth
 
 from django.contrib.auth.models import User
 
-from api.models import ReceiptItem, Budget, CustomUser, Category
+from api.models import ReceiptItem, Budget, UserSettings, Category
 from api.schema import GetBudgetSchema, BudgetRemainingSchema, UpdateBudgetSchema, Message
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ def get_remaining_budget(request, username: str | None = None):
     today = date.today()
 
     # find receipts for the current period
-    period = CustomUser.objects.get(user=user).budget_period
+    period = UserSettings.objects.get(user=user).budget_period
     if period == "weekly":
         start_date = today - timedelta(days=(today.weekday() + 1) % 7)
         end_date = start_date + timedelta(days=6)
