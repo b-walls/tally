@@ -1,4 +1,6 @@
 import { useAuth } from "../../contexts/AuthContext"
+import { useState, useRef } from "react"
+
 import { useNavigate, Link } from "react-router-dom"
 import { TbTextScan2, TbGraph, TbMoneybag } from "react-icons/tb"
 import icon from '../../assets/icon.svg'
@@ -35,18 +37,112 @@ function FeatureItem({ icon: Icon, title, description }) {
   )
 }
 
+function PasswordStrengthIndicator({ strength }) {
+  let color1 = "surface";
+  let color2 = "surface";
+  let color3 = "surface";
+  if (strength < 0) {
+    color1 = "surface";
+    color2 = "surface";
+    color3 = "surface";
+  } else if (strength < 1) {
+    color1 = "danger";
+    color2 = "surface";
+    color3 = "surface";
+  } else if (strength < 1.5) {
+    color1 = "warning";
+    color2 = "surface";
+    color3 = "surface";
+  } else if (strength < 2) {
+    color1 = "success";
+    color2 = "warning";
+    color3 = "surface";
+  } else if (strength < 2.5) {
+    color1 = "success";
+    color2 = "success";
+    color3 = "surface";
+  } else if (strength < 3) {
+    color1 = "success";
+    color2 = "success";
+    color3 = "warning";
+  } else {
+    color1 = "success";
+    color2 = "success";
+    color3 = "success";
+  }
+  console.log(strength);
+
+  return (
+    <div className="flex items-center gap-3 my-1">
+      <div className={"flex-1 h-2 rounded-md bg-" + color1}/>
+      <div className={"flex-1 h-2 rounded-md bg-" + color2}/>
+      <div className={"flex-1 h-2 rounded-md bg-" + color3}/>
+    </div>
+  );
+}
+
 function RegisterPage() {
   const navigate = useNavigate()
+  const [password, setPassword] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState(-1);
+
+  function verifyPassword(confirmPassword) {
+    if (password !== confirmPassword) {
+      return false;
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
       const formData = new FormData(e.target)
+
       await register(formData.get("email"), formData.get("password"), formData.get("firstName"), formData.get("lastName"))
       navigate('/login')
     } catch (err) {
       console.log(err)
     }
+  }
+
+  const updatePassword = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+
+    if (value.length == 0) {
+      setPasswordStrength(-1);
+      return;
+    }
+
+    let currStrength = 0;
+
+    if (value.length >= 8) {
+      currStrength += 0.5
+    }
+
+    if (value.length >= 12) {
+      currStrength += 0.5
+    }
+
+    if (/[a-z]/.test(value)) {
+      currStrength += 0.5
+    }
+
+    if (/[A-Z]/.test(value)) {
+      currStrength += 0.5
+    }
+
+    if (/[0-9]/.test(value)) {
+      currStrength += 0.5
+    }
+  
+    const specialChars = "!@#$%^&*()_+[]{};':\"\\|,.<>/?~-";
+    for (let i = 0; i < specialChars.length; i++) {
+      if (value.includes(specialChars[i])) {
+        currStrength += 0.5
+      }
+    }
+
+    setPasswordStrength(currStrength);
   }
 
   return (
@@ -106,13 +202,14 @@ function RegisterPage() {
             <label className="text-text-muted text-md" htmlFor="email-input">Email Address</label>
             <input className="border border-border rounded-md p-3 bg-surface focus:border-primary" type="email" name="email" id="email-input" />
           </div>
-          <div className="flex flex-col gap-1 max-h-[78px]">
+          <div className="flex flex-col gap-1 max-h-[78px] mb-3">
             <label className="text-text-muted text-md" htmlFor="password-input">Password</label>
-            <input className="border border-border rounded-md p-3 bg-surface focus:border-primary" type="password" name="password" id="password-input" />
+            <input className="border border-border rounded-md p-3 bg-surface focus:border-primary grow" type="password" name="password" id="password-input" autoComplete="new-password" value={password} onChange={updatePassword}/>
+            <PasswordStrengthIndicator strength={passwordStrength}/>
           </div>
           <div className="flex flex-col gap-1 max-h-[78px]">
             <label className="text-text-muted text-md" htmlFor="confirm-password-input">Confirm Password</label>
-            <input className="border border-border rounded-md p-3 bg-surface focus:border-primary" type="password" name="confirmPassword" id="confirm-password-input" />
+            <input className="border border-border rounded-md p-3 bg-surface focus:border-primary" type="password" name="confirmPassword" id="confirm-password-input" autoComplete="new-password"/>
           </div>
           <button className="bg-primary hover:bg-primary-hover text-background font-semibold px-5 py-2 rounded-lg text-sm transition-colors cursor-pointer mt-3" type="submit">
             Create account
