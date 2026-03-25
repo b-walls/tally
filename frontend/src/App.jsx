@@ -9,7 +9,8 @@ import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import BudgetPage from './pages/BudgetPage'
-import ReceiptsPage from './pages/ReceiptsPage'
+import ExpensesPage from './pages/ExpensesPage'
+import ReportsPage from './pages/ReportsPage'
 
 export default function App() {
   return (
@@ -30,7 +31,8 @@ export default function App() {
       >
         <Route index element={<DashboardPage />} />
         <Route path="/budget" element={<BudgetPage />} />
-        <Route path="/receipts" element={<ReceiptsPage />} />
+        <Route path="/expenses" element={<ExpensesPage />} />
+        <Route path="/reports" element={<ReportsPage/>}/>
       </Route>
 
       {/* ── Dev only ─────────────────────────────────────────────────── */}
