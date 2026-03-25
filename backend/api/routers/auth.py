@@ -1,17 +1,15 @@
 import logging
 
 from ninja import Router, Status
-from ninja_jwt.tokens import RefreshToken, TokenError
 
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from django.http import HttpResponse
 
 from api.models import Category, Budget, UserSettings, CATEGORY_CHOICES
-from api.auth import CookieAuth, set_auth_cookies, clear_auth_cookies, REFRESH_COOKIE
+from api.auth import SessionAuth
 from api.schema import Message, RegisterSchema, LoginSchema, UserSchema
 
 logger = logging.getLogger(__name__)
@@ -31,7 +29,7 @@ def register(request, credentials: RegisterSchema):
         user.save()
 
         UserSettings.objects.create(user=user)
-        
+
         for item in CATEGORY_CHOICES:
             category = Category.objects.create(name=item, user=user)
             Budget.objects.create(user=user, category=category, limit=0)
@@ -48,52 +46,20 @@ def register(request, credentials: RegisterSchema):
 
 @auth_router.post("/login", response={200: Message, 401: Message})
 def login(request, credentials: LoginSchema):
-    user = authenticate(username=credentials.username, password=credentials.password)
+    user = authenticate(request, username=credentials.username, password=credentials.password)
     if not user:
         return Status(401, {'message': 'Invalid username or password'})
 
-    response = HttpResponse()
-    set_auth_cookies(response, user)
-    response["Content-Type"] = "application/json"
-    response.content = b'{"message": "Login successful"}'
-    return response
+    auth_login(request, user)
+    return 200, {'message': 'Login successful'}
 
-@auth_router.get("/me", auth=CookieAuth(), response={200: UserSchema, 401: Message})
+
+@auth_router.get("/me", auth=SessionAuth(), response={200: UserSchema, 401: Message})
 def user_info(request):
-    user = request.auth
-    return 200, user
+    return 200, request.user
 
 
-@auth_router.post("/logout", auth=CookieAuth())
+@auth_router.post("/logout", auth=SessionAuth(), response={200: Message})
 def logout(request):
-    refresh_token = request.COOKIES.get(REFRESH_COOKIE)
-    if refresh_token:
-        try:
-            RefreshToken(refresh_token).blacklist()
-        except TokenError:
-            pass  # already invalid, proceed with clearing cookies
-
-    response = HttpResponse()
-    clear_auth_cookies(response)
-    response["Content-Type"] = "application/json"
-    response.content = b'{"message": "Logged out successfully"}'
-    return response
-
-
-@auth_router.post("/refresh", response={200: Message, 401: Message})
-def refresh(request):
-    refresh_token = request.COOKIES.get(REFRESH_COOKIE)
-    if not refresh_token:
-        return Status(401, {'message': 'No refresh token'})
-
-    try:
-        refresh = RefreshToken(refresh_token)
-        user = User.objects.get(id=refresh["user_id"])
-    except (TokenError, User.DoesNotExist):
-        return Status(401, {'message': 'Invalid or expired refresh token'})
-
-    response = HttpResponse()
-    set_auth_cookies(response, user)
-    response["Content-Type"] = "application/json"
-    response.content = b'{"message": "Token refreshed"}'
-    return response
+    auth_logout(request)
+    return 200, {'message': 'Logged out successfully'}

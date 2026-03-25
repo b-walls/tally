@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-from datetime import timedelta
 from pathlib import Path
 
 from decouple import AutoConfig
@@ -42,8 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'ninja_jwt',
-    'ninja_jwt.token_blacklist',
     'ninja_extra',
     'api',
     'storages',
@@ -174,8 +171,7 @@ STORAGES = {
 
 MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
 
-# Ninja JWT config (token lifetimes only — auth is via HttpOnly cookies)
-NINJA_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-}
+# Session cookie security
+SESSION_COOKIE_HTTPONLY = True    # default, but explicit for clarity
+SESSION_COOKIE_SAMESITE = "Lax"  # default, protects against CSRF
+SESSION_COOKIE_SECURE = not DEBUG  # True in production (requires HTTPS)

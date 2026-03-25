@@ -1,9 +1,12 @@
 import { useAuth } from "../../contexts/AuthContext"
-import { useState, useRef } from "react"
+import zxcvbn from 'zxcvbn';
 
+import { useState, useRef } from "react"
 import { useNavigate, Link } from "react-router-dom"
+
 import { TbTextScan2, TbGraph, TbMoneybag } from "react-icons/tb"
-import icon from '../../assets/icon.svg'
+
+import tally_icon_128 from '../../assets/tally_icon_128.svg'
 import { register } from "../../api/auth"
 
 const FEATURES = [
@@ -37,46 +40,62 @@ function FeatureItem({ icon: Icon, title, description }) {
   )
 }
 
-function PasswordStrengthIndicator({ strength }) {
-  let color1 = "surface";
-  let color2 = "surface";
-  let color3 = "surface";
-  if (strength < 0) {
-    color1 = "surface";
-    color2 = "surface";
-    color3 = "surface";
-  } else if (strength < 1) {
-    color1 = "danger";
-    color2 = "surface";
-    color3 = "surface";
-  } else if (strength < 1.5) {
-    color1 = "warning";
-    color2 = "surface";
-    color3 = "surface";
-  } else if (strength < 2) {
-    color1 = "success";
-    color2 = "warning";
-    color3 = "surface";
-  } else if (strength < 2.5) {
-    color1 = "success";
-    color2 = "success";
-    color3 = "surface";
-  } else if (strength < 3) {
-    color1 = "success";
-    color2 = "success";
-    color3 = "warning";
-  } else {
-    color1 = "success";
-    color2 = "success";
-    color3 = "success";
+function PasswordStrengthIndicator({ strength, feedback }) {
+  let colors = [];
+  let message = null;
+  let feedbackColor = "";
+
+  switch (strength) {
+    case -1:
+      colors = ["surface", "surface", "surface"];
+      break;
+    case 0:
+      colors = ["danger", "surface", "surface"];
+      feedbackColor = "danger";
+      if (feedback.length == 0) {
+        message = "Very weak";
+      } else {
+        message = feedback;
+      }
+      break;
+    case 1:
+      colors = ["warning", "surface", "surface"];
+      feedbackColor = "warning";
+      if (feedback.length == 0) {
+        message = "Weak";
+      } else {
+        message = feedback;
+      }
+      break;
+    case 2:
+      colors = ["warning", "warning", "surface"];
+      feedbackColor = "warning";
+      if (feedback.length == 0) {
+        message = "Weak";
+      } else {
+        message = feedback;
+      }
+      break;
+    case 3:
+      colors = ["success", "success", "surface"];
+      message = "Strong";
+      feedbackColor = "success"
+      break;
+    case 4:
+      colors = ["success", "success", "success"];
+      message = "Very strong"
+      feedbackColor = "success"
+      break;
   }
-  console.log(strength);
 
   return (
-    <div className="flex items-center gap-3 my-1">
-      <div className={"flex-1 h-2 rounded-md bg-" + color1}/>
-      <div className={"flex-1 h-2 rounded-md bg-" + color2}/>
-      <div className={"flex-1 h-2 rounded-md bg-" + color3}/>
+    <div>
+      <div className="flex items-center gap-3 py-1 px-1">
+        <div className={"flex-1 h-1 rounded-md bg-" + colors[0]}/>
+        <div className={"flex-1 h-1 rounded-md bg-" + colors[1]}/>
+        <div className={"flex-1 h-1 rounded-md bg-" + colors[2]}/>
+      </div>
+      <p className={"text-" + feedbackColor}>{ message ? message : "\u00A0"}</p>
     </div>
   );
 }
@@ -85,6 +104,7 @@ function RegisterPage() {
   const navigate = useNavigate()
   const [password, setPassword] = useState("");
   const [passwordStrength, setPasswordStrength] = useState(-1);
+  const [passwordFeedback, setPasswordFeedback] = useState("");
 
   function verifyPassword(confirmPassword) {
     if (password !== confirmPassword) {
@@ -113,45 +133,23 @@ function RegisterPage() {
       return;
     }
 
-    let currStrength = 0;
-
-    if (value.length >= 8) {
-      currStrength += 0.5
+    const result = zxcvbn(value);
+    if (result.score <= 2 && result.feedback.warning) {
+      setPasswordFeedback(result.feedback.warning);
+    } else {
+      setPasswordFeedback("");
     }
 
-    if (value.length >= 12) {
-      currStrength += 0.5
-    }
-
-    if (/[a-z]/.test(value)) {
-      currStrength += 0.5
-    }
-
-    if (/[A-Z]/.test(value)) {
-      currStrength += 0.5
-    }
-
-    if (/[0-9]/.test(value)) {
-      currStrength += 0.5
-    }
-  
-    const specialChars = "!@#$%^&*()_+[]{};':\"\\|,.<>/?~-";
-    for (let i = 0; i < specialChars.length; i++) {
-      if (value.includes(specialChars[i])) {
-        currStrength += 0.5
-      }
-    }
-
-    setPasswordStrength(currStrength);
+    setPasswordStrength(result.score);
   }
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen">
+    <div className="flex flex-col lg:flex-row max-h-screen">
 
       {/* Marketing panel — desktop only */}
       <div className="hidden lg:flex flex-col justify-between basis-3/5 bg-surface p-[clamp(2rem,6vw,4rem)] overflow-hidden">
         <div className="flex flex-row gap-3 items-center">
-          <img className="w-[clamp(4rem,8vw,7rem)] bg-surface-raised border border-border rounded-md" src={icon} alt="Tally logo" />
+          <img className="w-[clamp(4rem,8vw,7rem)] **:rounded-md" src={tally_icon_128} alt="Tally logo" />
           <div className="flex flex-col justify-center">
             <h1 className="text-[clamp(1.5rem,3vw,2.25rem)] font-extrabold">Tally</h1>
             <p className="text-[clamp(0.65rem,1vw,0.875rem)] uppercase tracking-widest text-text-muted">Budget & Expense Tracking</p>
@@ -174,40 +172,40 @@ function RegisterPage() {
       <div className="flex-1 lg:basis-2/5 bg-surface-raised p-8 sm:p-12 lg:p-24 flex flex-col justify-center lg:border-l border-border">
 
         {/* Mobile logo */}
-        <div className="flex flex-col lg:hidden items-center justify-center mb-8 gap-1">
+        {/* <div className="flex flex-col lg:hidden items-center justify-center mb-8 gap-1">
           <div className="flex flex-row items-center gap-3">
             <img className="w-10 h-10 rounded-lg" src={icon} alt="Tally logo" />
             <h1 className="text-3xl font-extrabold tracking-tight">Tally</h1>
           </div>
           <p className="text-xs uppercase tracking-widest text-text-muted font-medium">Budget & Expense Tracking</p>
-        </div>
+        </div> */}
 
         <div className="mb-6 text-center lg:text-start">
           <h1 className="text-3xl font-bold">Create an account</h1>
           <p className="text-text-muted text-sm mt-1">Sign up to get started</p>
         </div>
 
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <div className="flex flex-col md:flex-row gap-5">
-            <div className="flex flex-col gap-1 grow max-h-[78px]">
+        <form className="flex flex-col" onSubmit={handleSubmit}>
+          <div className="flex flex-col sm:flex-row gap-3 mb-3">
+            <div className="flex flex-col gap-1 grow max-h-19.5">
               <label className="text-text-muted text-md" htmlFor="first-name-input">First name</label>
               <input className="border border-border rounded-md p-3 bg-surface focus:border-primary" type="text" name="firstName" id="first-name-input" />  
             </div>
-            <div className="flex flex-col gap-1 grow max-h-[78px]">
+            <div className="flex flex-col gap-1 grow max-h-19.5">
               <label className="text-text-muted text-md" htmlFor="last-name-input">Last name</label>
               <input className="border border-border rounded-md p-3 bg-surface focus:border-primary" type="text" name="lastName" id="last-name-input" />  
             </div>
           </div>
-          <div className="flex flex-col gap-1 max-h-[78px]">
+          <div className="flex flex-col gap-1 max-h-19.5 mb-3">
             <label className="text-text-muted text-md" htmlFor="email-input">Email Address</label>
             <input className="border border-border rounded-md p-3 bg-surface focus:border-primary" type="email" name="email" id="email-input" />
           </div>
-          <div className="flex flex-col gap-1 max-h-[78px] mb-3">
+          <div className="flex flex-col gap-1 mb-1">
             <label className="text-text-muted text-md" htmlFor="password-input">Password</label>
             <input className="border border-border rounded-md p-3 bg-surface focus:border-primary grow" type="password" name="password" id="password-input" autoComplete="new-password" value={password} onChange={updatePassword}/>
-            <PasswordStrengthIndicator strength={passwordStrength}/>
+            <PasswordStrengthIndicator strength={passwordStrength} feedback={passwordFeedback}/>
           </div>
-          <div className="flex flex-col gap-1 max-h-[78px]">
+          <div className="flex flex-col gap-1  max-h-19.5">
             <label className="text-text-muted text-md" htmlFor="confirm-password-input">Confirm Password</label>
             <input className="border border-border rounded-md p-3 bg-surface focus:border-primary" type="password" name="confirmPassword" id="confirm-password-input" autoComplete="new-password"/>
           </div>

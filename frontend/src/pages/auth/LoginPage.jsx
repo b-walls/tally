@@ -1,7 +1,7 @@
 import { useAuth } from "../../contexts/AuthContext"
 import { useNavigate, Link } from "react-router-dom"
 import { TbTextScan2, TbGraph, TbMoneybag } from "react-icons/tb"
-import icon from '../../assets/icon.svg'
+import tally_icon_128 from '../../assets/tally_icon_128.svg'
 
 const FEATURES = [
   {
@@ -55,7 +55,7 @@ function LoginPage() {
       {/* Marketing panel — desktop only */}
       <div className="hidden lg:flex flex-col justify-between basis-3/5 bg-surface p-[clamp(2rem,6vw,4rem)] overflow-hidden">
         <div className="flex flex-row gap-3 items-center">
-          <img className="w-[clamp(4rem,8vw,7rem)] bg-surface-raised border border-border rounded-md" src={icon} alt="Tally logo" />
+          <img className="w-[clamp(4rem,8vw,7rem)] rounded-md" src={tally_icon_128} alt="Tally logo" />
           <div className="flex flex-col justify-center">
             <h1 className="text-[clamp(1.5rem,3vw,2.25rem)] font-extrabold">Tally</h1>
             <p className="text-[clamp(0.65rem,1vw,0.875rem)] uppercase tracking-widest text-text-muted">Budget & Expense Tracking</p>
@@ -78,14 +78,6 @@ function LoginPage() {
       <div className="flex-1 lg:basis-2/5 bg-surface-raised p-8 sm:p-12 lg:p-24 flex flex-col justify-center">
 
         {/* Mobile logo */}
-        <div className="flex flex-col lg:hidden items-center justify-center mb-8 gap-1">
-          <div className="flex flex-row items-center gap-3">
-            <img className="w-10 h-10 rounded-lg" src={icon} alt="Tally logo" />
-            <h1 className="text-3xl font-extrabold tracking-tight">Tally</h1>
-          </div>
-          <p className="text-xs uppercase tracking-widest text-text-muted font-medium">Budget & Expense Tracking</p>
-        </div>
-
         <div className="mb-6 text-center lg:text-start">
           <h1 className="text-3xl font-bold">Welcome back</h1>
           <p className="text-text-muted text-sm mt-1">Sign in to your account</p>

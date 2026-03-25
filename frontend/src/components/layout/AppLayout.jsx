@@ -1,11 +1,13 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 
 export default function AppLayout() {
   const { logout } = useAuth();
-  
-  const logoutCallback = () => {
-    logout();
+  const navigate = useNavigate();
+
+  const logoutCallback = async () => {
+    await logout();
+    navigate('/login');
   }
 
   return (
