@@ -3,7 +3,7 @@ import Navbar from '../Navbar';
 
 export default function AppLayout() {
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-col-reverse md:flex-row">
       <nav>
         <Navbar />
       </nav>

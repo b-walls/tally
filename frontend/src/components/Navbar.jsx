@@ -22,7 +22,8 @@ function Navbar() {
     const { user } = useAuth()
 
     return (
-        <div className="flex flex-col bg-surface px-4 pt-10 pb-5 border-r border-border h-screen justify-between">
+        <>
+        <div className="flex flex-col bg-surface px-4 pt-10 pb-5 border-r border-border h-screen justify-between hidden md:block">
             <div>
                 <div className='flex flex-row items-center'>
                     <img src={tally_icon_32} alt="Tally logo" />
@@ -55,6 +56,10 @@ function Navbar() {
                 </Link>
             </div>
         </div>
+        <div className="md:hidden">
+
+        </div>
+        </>
     )
 }
 
