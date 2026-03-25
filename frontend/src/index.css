@@ -1,6 +1,14 @@
+/* Google Fonts must be imported before tailwindcss */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+
 @import "tailwindcss";
 
 @theme {
+  /* --font-sans is Tailwind v4's built-in variable — applied to body automatically via preflight */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* --font-heading is applied to h1–h6 below */
+  --font-heading: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
   --color-background: #111111;
   --color-surface: #1c1c1c;
   --color-surface-raised: #252525;
@@ -25,6 +33,10 @@
 
 body {
   color: #eceaf8;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
 }
 
 input, textarea, select {

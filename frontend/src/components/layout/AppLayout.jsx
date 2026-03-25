@@ -1,23 +1,13 @@
-import { Outlet, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../contexts/AuthContext'
+import { Outlet } from 'react-router-dom'
+import Navbar from '../Navbar'; 
 
 export default function AppLayout() {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
-
-  const logoutCallback = async () => {
-    await logout();
-    navigate('/login');
-  }
-
   return (
-    <div>
+    <div className="flex flex-row">
       <nav>
-        <button onClick={logoutCallback}>
-          logout
-        </button>
+        <Navbar />
       </nav>
-      <main>
+      <main className="w-full">
         <Outlet />
       </main>
     </div>

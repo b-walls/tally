@@ -14,7 +14,7 @@ category_router = Router(auth=SessionAuth())
 
 @category_router.get("/", response={200: list[CategorySchema]})
 def get_categories(request, username: str | None = None):
-
+    """gets a list of categories for the user"""
     user = request.user
 
     if user.is_superuser and username is not None:

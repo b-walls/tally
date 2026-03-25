@@ -13,7 +13,7 @@ export default function ProtectedRoute({ children }) {
 
   if (loading) {
     return (
-      <div style={{ display: 'grid', placeItems: 'center', height: '100vh' }}>
+      <div className="grid place-items-center h-screen">
         Loading…
       </div>
     )

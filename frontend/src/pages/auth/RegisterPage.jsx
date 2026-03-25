@@ -1,12 +1,11 @@
-import { useAuth } from "../../contexts/AuthContext"
 import zxcvbn from 'zxcvbn';
 
-import { useState, useRef } from "react"
+import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 
 import { TbTextScan2, TbGraph, TbMoneybag } from "react-icons/tb"
 
-import tally_icon_128 from '../../assets/tally_icon_128.svg'
+import tally_icon_64 from '../../assets/tally_icon_64.svg'
 import { register } from "../../api/auth"
 
 const FEATURES = [
@@ -40,6 +39,23 @@ function FeatureItem({ icon: Icon, title, description }) {
   )
 }
 
+// Static class maps are required — Tailwind uses static analysis to build its
+// stylesheet. Dynamically concatenated strings like "bg-" + color are never
+// seen by the analyser and get purged from production builds, breaking styles.
+const BAR_COLOR = {
+  surface: "bg-surface",
+  danger:  "bg-danger",
+  warning: "bg-warning",
+  success: "bg-success",
+}
+
+const TEXT_COLOR = {
+  "":      "text-text",
+  danger:  "text-danger",
+  warning: "text-warning",
+  success: "text-success",
+}
+
 function PasswordStrengthIndicator({ strength, feedback }) {
   let colors = [];
   let message = null;
@@ -52,50 +68,38 @@ function PasswordStrengthIndicator({ strength, feedback }) {
     case 0:
       colors = ["danger", "surface", "surface"];
       feedbackColor = "danger";
-      if (feedback.length == 0) {
-        message = "Very weak";
-      } else {
-        message = feedback;
-      }
+      message = feedback.length > 0 ? feedback : "Very weak";
       break;
     case 1:
       colors = ["warning", "surface", "surface"];
       feedbackColor = "warning";
-      if (feedback.length == 0) {
-        message = "Weak";
-      } else {
-        message = feedback;
-      }
+      message = feedback.length > 0 ? feedback : "Weak";
       break;
     case 2:
       colors = ["warning", "warning", "surface"];
       feedbackColor = "warning";
-      if (feedback.length == 0) {
-        message = "Weak";
-      } else {
-        message = feedback;
-      }
+      message = feedback.length > 0 ? feedback : "Weak";
       break;
     case 3:
       colors = ["success", "success", "surface"];
+      feedbackColor = "success";
       message = "Strong";
-      feedbackColor = "success"
       break;
     case 4:
       colors = ["success", "success", "success"];
-      message = "Very strong"
-      feedbackColor = "success"
+      feedbackColor = "success";
+      message = "Very strong";
       break;
   }
 
   return (
     <div>
       <div className="flex items-center gap-3 py-1 px-1">
-        <div className={"flex-1 h-1 rounded-md bg-" + colors[0]}/>
-        <div className={"flex-1 h-1 rounded-md bg-" + colors[1]}/>
-        <div className={"flex-1 h-1 rounded-md bg-" + colors[2]}/>
+        <div className={`flex-1 h-1 rounded-md ${BAR_COLOR[colors[0]]}`} />
+        <div className={`flex-1 h-1 rounded-md ${BAR_COLOR[colors[1]]}`} />
+        <div className={`flex-1 h-1 rounded-md ${BAR_COLOR[colors[2]]}`} />
       </div>
-      <p className={"text-" + feedbackColor}>{ message ? message : "\u00A0"}</p>
+      <p className={TEXT_COLOR[feedbackColor]}>{message ?? "\u00A0"}</p>
     </div>
   );
 }
@@ -144,20 +148,17 @@ function RegisterPage() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row max-h-screen">
+    <div className="flex flex-col lg:flex-row h-screen">
 
       {/* Marketing panel — desktop only */}
       <div className="hidden lg:flex flex-col justify-between basis-3/5 bg-surface p-[clamp(2rem,6vw,4rem)] overflow-hidden">
-        <div className="flex flex-row gap-3 items-center">
-          <img className="w-[clamp(4rem,8vw,7rem)] **:rounded-md" src={tally_icon_128} alt="Tally logo" />
-          <div className="flex flex-col justify-center">
-            <h1 className="text-[clamp(1.5rem,3vw,2.25rem)] font-extrabold">Tally</h1>
-            <p className="text-[clamp(0.65rem,1vw,0.875rem)] uppercase tracking-widest text-text-muted">Budget & Expense Tracking</p>
-          </div>
+        <div className="flex flex-row items-center">
+          <img src={tally_icon_64} alt="Tally logo" />
+          <h1 className="text-[clamp(1.5rem,3vw,2.25rem)] font-extrabold tracking-tight">Tally</h1>
         </div>
 
         <div>
-          <h2 className="text-[clamp(1.5rem,3vw,2.25rem)]/[1] font-bold font-">Start tracking<br/> expenses for free.</h2>
+          <h2 className="text-[clamp(1.5rem,3vw,2.25rem)]/[1] font-bold">Start tracking<br/> expenses for free.</h2>
           <p className="text-[clamp(0.9rem,1.5vw,1.25rem)] text-text-muted mt-2">No credit card required. Up and running in under a minute.</p>
         </div>
 
@@ -171,14 +172,12 @@ function RegisterPage() {
       {/* Register form panel */}
       <div className="flex-1 lg:basis-2/5 bg-surface-raised p-8 sm:p-12 lg:p-24 flex flex-col justify-center lg:border-l border-border">
 
-        {/* Mobile logo */}
-        {/* <div className="flex flex-col lg:hidden items-center justify-center mb-8 gap-1">
-          <div className="flex flex-row items-center gap-3">
-            <img className="w-10 h-10 rounded-lg" src={icon} alt="Tally logo" />
-            <h1 className="text-3xl font-extrabold tracking-tight">Tally</h1>
-          </div>
-          <p className="text-xs uppercase tracking-widest text-text-muted font-medium">Budget & Expense Tracking</p>
-        </div> */}
+        {/* Branding — visible only when the left panel is hidden */}
+        <div className="flex flex-col items-center gap-2 mb-10 lg:hidden">
+          <img src={tally_icon_64} alt="Tally logo" />
+          <h1 className="text-2xl font-extrabold tracking-tight">Tally</h1>
+          <p className="text-xs uppercase tracking-widest text-text-muted">Budget & Expense Tracking</p>
+        </div>
 
         <div className="mb-6 text-center lg:text-start">
           <h1 className="text-3xl font-bold">Create an account</h1>

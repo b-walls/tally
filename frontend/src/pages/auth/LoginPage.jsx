@@ -1,7 +1,7 @@
 import { useAuth } from "../../contexts/AuthContext"
 import { useNavigate, Link } from "react-router-dom"
 import { TbTextScan2, TbGraph, TbMoneybag } from "react-icons/tb"
-import tally_icon_128 from '../../assets/tally_icon_128.svg'
+import tally_icon_64 from '../../assets/tally_icon_64.svg'
 
 const FEATURES = [
   {
@@ -54,16 +54,13 @@ function LoginPage() {
 
       {/* Marketing panel — desktop only */}
       <div className="hidden lg:flex flex-col justify-between basis-3/5 bg-surface p-[clamp(2rem,6vw,4rem)] overflow-hidden">
-        <div className="flex flex-row gap-3 items-center">
-          <img className="w-[clamp(4rem,8vw,7rem)] rounded-md" src={tally_icon_128} alt="Tally logo" />
-          <div className="flex flex-col justify-center">
-            <h1 className="text-[clamp(1.5rem,3vw,2.25rem)] font-extrabold">Tally</h1>
-            <p className="text-[clamp(0.65rem,1vw,0.875rem)] uppercase tracking-widest text-text-muted">Budget & Expense Tracking</p>
-          </div>
+        <div className="flex flex-row items-center">
+          <img src={tally_icon_64} alt="Tally logo" />
+          <h1 className="text-[clamp(1.5rem,3vw,2.25rem)] font-extrabold tracking-tight">Tally</h1>
         </div>
 
         <div>
-          <h2 className="text-[clamp(1.5rem,3vw,2.25rem)]/[1] font-bold font-">Your expenses,<br />always organized.</h2>
+          <h2 className="text-[clamp(1.5rem,3vw,2.25rem)]/[1] font-bold">Your expenses,<br />always organized.</h2>
           <p className="text-[clamp(0.9rem,1.5vw,1.25rem)] text-text-muted mt-2">Organize, scan, and track expenses in seconds.</p>
         </div>
 
@@ -77,18 +74,24 @@ function LoginPage() {
       {/* Login form panel */}
       <div className="flex-1 lg:basis-2/5 bg-surface-raised p-8 sm:p-12 lg:p-24 flex flex-col justify-center">
 
-        {/* Mobile logo */}
+        {/* Branding — visible only when the left panel is hidden */}
+        <div className="flex flex-col items-center gap-2 mb-10 lg:hidden">
+          <img src={tally_icon_64} alt="Tally logo" />
+          <h1 className="text-2xl font-extrabold tracking-tight">Tally</h1>
+          <p className="text-xs uppercase tracking-widest text-text-muted">Budget & Expense Tracking</p>
+        </div>
+
         <div className="mb-6 text-center lg:text-start">
           <h1 className="text-3xl font-bold">Welcome back</h1>
           <p className="text-text-muted text-sm mt-1">Sign in to your account</p>
         </div>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <div className="flex flex-col gap-1 max-h-[78px]">
+          <div className="flex flex-col gap-1 max-h-19.5">
             <label className="text-text-muted text-md" htmlFor="email-input">Email Address</label>
             <input className="border border-border rounded-md p-3 bg-surface focus:border-primary" type="email" name="email" id="email-input" />
           </div>
-          <div className="flex flex-col gap-1 max-h-[78px]">
+          <div className="flex flex-col gap-1 max-h-19.5">
             <label className="text-text-muted text-md" htmlFor="password-input">Password</label>
             <input className="border border-border rounded-md p-3 bg-surface focus:border-primary" type="password" name="password" id="password-input" />
           </div>

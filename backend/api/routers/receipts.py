@@ -44,6 +44,7 @@ async def scan_request(categories: list[str], base64_img: str) -> ScanResponse:
                                 "Normalize the date into YYYY-MM-DD when possible and return prices as numbers without currency symbols. "
                                 f"Each item category must be one of: {', '.join(categories)}. "
                                 "If none fit, use 'Other'."
+                                "For sales tax label it as the category most apparent in the transaction and treat it as a line item"
                                 "Return data that matches the provided schema exactly."
                             ),
                         }
@@ -149,6 +150,7 @@ async def scan(request, file: File[UploadedFile]):
 
 @receipt_router.get("/{id}/image")
 def get_receipt_image(request, id: int):
+    """gets the image for a receipt"""
     user = request.user
     receipt = get_object_or_404(Receipt, id=id)
 
@@ -164,6 +166,7 @@ def get_receipt_image(request, id: int):
 
 @receipt_router.get("/{id}", response={200: ReceiptSchema, 403: Message})
 def receipt_detail(request, id: int):
+    """gets a receipt by id (including items)"""
     user = request.user
     receipt = get_object_or_404(Receipt, id=id)
 
@@ -190,6 +193,7 @@ def receipt_detail(request, id: int):
 
 @receipt_router.patch("/{id}", response={200: ReceiptSchema, 403: Message, 422: Message})
 def update_receipt(request, id: int, payload: UpdateReceiptSchema):
+    """update a receipt by id"""
     user = request.user
     receipt = get_object_or_404(Receipt, id=id)
 
