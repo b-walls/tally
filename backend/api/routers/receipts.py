@@ -134,10 +134,10 @@ async def scan(request, file: File[UploadedFile]):
                                                           confirmed=False,
                                                           id=receipt_item.id))
 
-        receipt_schema = ReceiptSchema(merhcant=receipt.merchant,
-                            date=receipt.date.strftime("%Y-%m-%d"),
+        receipt_schema = ReceiptSchema(merchant=receipt.merchant,
+                            date=receipt.date,
                             total=receipt.total,
-                            created_at=receipt.created_at.strftime("%Y-%m-%d"),
+                            created_at=receipt.created_at,
                             items=receipt_item_schemas,
                             id=receipt.id)
 
@@ -168,26 +168,12 @@ def get_receipt_image(request, id: int):
 def receipt_detail(request, id: int):
     """gets a receipt by id (including items)"""
     user = request.user
-    receipt = get_object_or_404(Receipt, id=id)
+    receipt = get_object_or_404(
+        Receipt.objects.prefetch_related('receiptitem_set__category'), id=id
+    )
 
     if not (receipt.user.id == user.id or user.is_superuser):
         return Status(403, "Forbidden")
-
-    items = ReceiptItem.objects.filter(receipt=receipt)
-    receipt_items = []
-    for item in items:
-        receipt_items.append(ReceiptItemSchema(name=item.name,
-                                         category=item.category.name,
-                                         amount=item.amount,
-                                         confirmed=item.confirmed,
-                                         id=item.id))
-
-    receipt = ReceiptSchema(merhcant=receipt.merchant,
-                            date=receipt.date.strftime("%Y-%m-%d"),
-                            total=receipt.total,
-                            created_at=receipt.created_at.strftime("%Y-%m-%d"),
-                            items=receipt_items,
-                            id=id)
 
     return Status(200, receipt)
 
@@ -212,22 +198,7 @@ def update_receipt(request, id: int, payload: UpdateReceiptSchema):
         receipt.total = payload.total
     
     receipt.save()
-    items = ReceiptItem.objects.filter(receipt=receipt)
-    receipt_items = []
-    for item in items:
-        receipt_items.append(ReceiptItemSchema(name=item.name,
-                                         category=item.category.name,
-                                         amount=item.amount,
-                                         confirmed=item.confirmed,
-                                         id=item.id))
-
-    receipt = ReceiptSchema(merhcant=receipt.merchant,
-                            date=receipt.date.strftime("%Y-%m-%d"),
-                            total=receipt.total,
-                            created_at=receipt.created_at.strftime("%Y-%m-%d"),
-                            items=receipt_items,
-                            id=id)
-
+    receipt = Receipt.objects.prefetch_related('receiptitem_set__category').get(id=receipt.id)
     return Status(200, receipt)
 
 @receipt_router.patch("/items/{id}", response={200: Message, 403: Message, 400: Message})

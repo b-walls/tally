@@ -25,22 +25,12 @@ def get_remaining_budget(request, username: str | None = None):
 
     today = date.today()
 
-    # find expenses for the current period
-    period = UserSettings.objects.get(user=user).budget_period
-    if period == "weekly":
-        start_date = today - timedelta(days=(today.weekday() + 1) % 7)
-        end_date = start_date + timedelta(days=6)
-        receipt_items = ReceiptItem.objects.filter(receipt__user=user,
-                                                   receipt__date__range=(start_date, end_date))
-        expenses = Expense.objects.filter(user=user,
-                                          date__range=(start_date, end_date))
-    else:
-        receipt_items = ReceiptItem.objects.filter(receipt__user=user,
-                                                   receipt__date__month=today.month,
-                                                   receipt__date__year=today.year)
-        expenses = Expense.objects.filter(user=user,
-                                          date__month=today.month,
-                                          date__year=today.year)
+    receipt_items = ReceiptItem.objects.filter(receipt__user=user,
+                                                receipt__date__month=today.month,
+                                                receipt__date__year=today.year)
+    expenses = Expense.objects.filter(user=user,
+                                        date__month=today.month,
+                                        date__year=today.year)
 
     budgets = Budget.objects.filter(user=user)
 
@@ -72,21 +62,15 @@ def get_budgets(request, username: str | None = None):
     if user.is_superuser and username is not None:
         user = User.objects.get(username=username)
     
-    budgets = Budget.objects.filter(user=user)
-    
-    results = []
-    for budget in budgets:
-        results.append(GetBudgetSchema(id=budget.id,
-                                       category=budget.category.name,
-                                       limit=budget.limit))
-    return Status(200, results)
+    budgets = Budget.objects.select_related('category').filter(user=user)
+    return Status(200, list(budgets))
 
 
 @budget_router.patch("/{id}", response={200: GetBudgetSchema, 403: Message})
 def update_budget(request, id: int, payload: UpdateBudgetSchema):
     """Gets a budget by id"""
     user = request.user
-    budget = Budget.objects.get(id=id)
+    budget = Budget.objects.select_related('category').get(id=id)
 
     if not (budget.user == user or user.is_superuser):
         return Status(403, "Unauthorized")
@@ -94,4 +78,4 @@ def update_budget(request, id: int, payload: UpdateBudgetSchema):
     budget.limit = payload.limit
     budget.save()
 
-    return Status(200, GetBudgetSchema(id=budget.id, category=budget.category.name, limit=budget.limit))
+    return Status(200, budget)
