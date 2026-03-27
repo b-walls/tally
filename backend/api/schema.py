@@ -1,16 +1,9 @@
-from decimal import Decimal
-from typing import Optional
-
 from pydantic import EmailStr
-from ninja import Schema, ModelSchema
-from django.contrib.auth.models import User
-
-from api.models import Budget, Category, Receipt, ReceiptItem
-
+from pydantic import BaseModel
+from ninja import Schema
 
 class Message(Schema):
     message: str
-
 
 class RegisterSchema(Schema):
     first_name: str
@@ -18,99 +11,68 @@ class RegisterSchema(Schema):
     password: str
     email: EmailStr
 
-
 class LoginSchema(Schema):
     username: str
     password: str
 
-
-class ScanItem(Schema):
+class ScanItem(BaseModel):
     category: str
     name: str
-    amount: Decimal
+    amount: float
 
-
-class ScanResponse(Schema):
+class ScanResponse(BaseModel):
     merchant: str
-    date: str  # raw string from AI — parsed later via parse_receipt_date
-    total: Decimal
+    date: str
+    total: float
     items: list[ScanItem]
 
-
-class ReceiptItemSchema(ModelSchema):
+class ReceiptItemSchema(Schema): 
+    id: int
+    name: str
     category: str
-
-    class Meta:
-        model = ReceiptItem
-        fields = ['id', 'name', 'amount', 'confirmed']
-
-    @staticmethod
-    def resolve_category(obj) -> str:
-        return obj.category.name
-
-
-class ReceiptSchema(ModelSchema):
+    amount: float
+    confirmed: bool
+    
+class ReceiptSchema(Schema):
+    id: int
+    merhcant: str
+    date: str
+    total: float
+    created_at: str
     items: list[ReceiptItemSchema]
 
-    class Meta:
-        model = Receipt
-        fields = ['id', 'merchant', 'date', 'total', 'created_at']
-
-    @staticmethod
-    def resolve_items(obj) -> list:
-        return obj.receiptitem_set.all()
-
-
 class UpdateReceiptSchema(Schema):
-    merchant: Optional[str] = None
-    date: Optional[str] = None  # string kept to allow parse_receipt_date validation in router
-    total: Optional[Decimal] = None
-
+    merchant: str = None
+    date: str = None
+    total: float = None
 
 class UpdateReceiptItemSchema(Schema):
-    username: Optional[str] = None
-    category: Optional[str] = None
-    amount: Optional[Decimal] = None
-    name: Optional[str] = None
-    confirmed: Optional[bool] = None
-
+    username: str = None
+    category: str = None
+    amount: float = None
+    name: str = None
+    confirmed: bool = None
 
 class BudgetRemainingSchema(Schema):
     id: int
     category: str
-    limit: Decimal
-    remaining: Decimal
+    limit: float
+    remaining: float
 
-
-class GetBudgetSchema(ModelSchema):
+class GetBudgetSchema(Schema):
+    id: int
     category: str
-
-    class Meta:
-        model = Budget
-        fields = ['id', 'limit']
-
-    @staticmethod
-    def resolve_category(obj) -> str:
-        return obj.category.name
-
+    limit: float
 
 class UpdateBudgetSchema(Schema):
-    limit: Decimal
+    limit: float
 
-
-class CategorySchema(ModelSchema):
+class CategorySchema(Schema):
+    id: int
     category: str
 
-    class Meta:
-        model = Category
-        fields = ['id']
-
-    @staticmethod
-    def resolve_category(obj) -> str:
-        return obj.name
-
-
-class UserSchema(ModelSchema):
-    class Meta:
-        model = User
-        fields = ['id', 'email', 'first_name', 'last_name']
+class UserSchema(Schema):
+    id: int
+    email: str
+    first_name: str
+    last_name: str

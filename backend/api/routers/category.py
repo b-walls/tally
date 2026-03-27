@@ -21,4 +21,4 @@ def get_categories(request, username: str | None = None):
         user = User.objects.get(username=username)
 
     categories = Category.objects.filter(user=user)
-    return Status(200, list(categories))
+    return Status(200, [CategorySchema(id=c.id, category=c.name) for c in categories])

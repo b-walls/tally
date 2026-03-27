@@ -52,6 +52,7 @@ def get_remaining_budget(request, username: str | None = None):
 
     return Status(200, results)  
 
+
 @budget_router.get("/", response={200: list[GetBudgetSchema]})
 def get_budgets(request, username: str | None = None):
     """Gets all budgets for a user"""
@@ -60,15 +61,21 @@ def get_budgets(request, username: str | None = None):
     if user.is_superuser and username is not None:
         user = User.objects.get(username=username)
     
-    budgets = Budget.objects.select_related('category').filter(user=user)
-    return Status(200, list(budgets))
+    budgets = Budget.objects.filter(user=user)
+    
+    results = []
+    for budget in budgets:
+        results.append(GetBudgetSchema(id=budget.id,
+                                       category=budget.category.name,
+                                       limit=budget.limit))
+    return Status(200, results)
 
 
 @budget_router.patch("/{id}", response={200: GetBudgetSchema, 403: Message})
 def update_budget(request, id: int, payload: UpdateBudgetSchema):
     """Gets a budget by id"""
     user = request.user
-    budget = Budget.objects.select_related('category').get(id=id)
+    budget = Budget.objects.get(id=id)
 
     if not (budget.user == user or user.is_superuser):
         return Status(403, "Unauthorized")
@@ -76,4 +83,4 @@ def update_budget(request, id: int, payload: UpdateBudgetSchema):
     budget.limit = payload.limit
     budget.save()
 
-    return Status(200, budget)
+    return Status(200, GetBudgetSchema(id=budget.id, category=budget.category.name, limit=budget.limit))
