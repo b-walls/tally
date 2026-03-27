@@ -1,7 +1,8 @@
 import { useLocation, Link } from 'react-router-dom';
 import { useAuth } from "../contexts/AuthContext"
-import tally_icon_32 from "../assets/tally_icon_32.svg"
 import { House, Landmark, Wallet, BarChart3, Settings } from 'lucide-react'
+
+import tally_icon_32 from "../assets/tally_icon_32.svg"
 
 function NavLinkCol({ to, text, selected, icon: Icon }) {
     return selected ? (

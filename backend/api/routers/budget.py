@@ -26,11 +26,11 @@ def get_remaining_budget(request, username: str | None = None):
     today = date.today()
 
     receipt_items = ReceiptItem.objects.filter(receipt__user=user,
-                                                receipt__date__month=today.month,
-                                                receipt__date__year=today.year)
+                                               receipt__date__month=today.month,
+                                               receipt__date__year=today.year)
     expenses = Expense.objects.filter(user=user,
-                                        date__month=today.month,
-                                        date__year=today.year)
+                                      date__month=today.month,
+                                      date__year=today.year)
 
     budgets = Budget.objects.filter(user=user)
 
@@ -42,7 +42,6 @@ def get_remaining_budget(request, username: str | None = None):
         category_spending[item.category.name] += item.total
 
     results = []
-    print(category_spending)
     for budget in budgets:
         curr_category = budget.category.name
         remaining = budget.limit - category_spending[curr_category]
@@ -51,8 +50,7 @@ def get_remaining_budget(request, username: str | None = None):
                                              limit=budget.limit,
                                              remaining=remaining))
 
-    return Status(200, results)
-
+    return Status(200, results)  
 
 @budget_router.get("/", response={200: list[GetBudgetSchema]})
 def get_budgets(request, username: str | None = None):
