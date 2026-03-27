@@ -38,7 +38,7 @@ function Navbar() {
 
     return (
         <>
-        <div className="flex-col bg-surface px-4 pt-10 pb-5 border-r border-border h-screen hidden md:flex justify-between">
+        <div className="flex-col bg-background px-4 pt-10 pb-5 border-r border-border h-screen hidden md:flex justify-between">
             <div>
                 <div className='flex flex-row items-center'>
                     <img src={tally_icon_32} alt="Tally logo" />
@@ -71,7 +71,7 @@ function Navbar() {
                 </Link>
             </div>
         </div>
-        <div className="md:hidden bg-surface flex flex-row justify-evenly py-1 gap-4">
+        <div className="md:hidden bg-background flex flex-row justify-evenly py-1 gap-4">
             <NavLinkRow to="/dashboard" text="Dashboard" icon={House} selected={currSelected === '/'}/>
             <NavLinkRow to="/expenses" text="Expenses" icon={Landmark} selected={currSelected.startsWith("/expenses")}/>
             <NavLinkRow to="/budget" text="Budget" icon={Wallet} selected={currSelected.startsWith("/budget")}/>

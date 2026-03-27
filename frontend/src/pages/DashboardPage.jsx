@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { getRemaining } from "../api/budget"; 
 import { useAuth } from "../contexts/AuthContext"
 import { Scan, Plus } from 'lucide-react'
+
 import BudgetOverview from "../components/BudgetOverview";
+import BarChart from "../components/BarChart"
 
 function DashboardPage() {
   const [loading, setLoading] = useState(true);
@@ -48,7 +50,7 @@ function DashboardPage() {
   const headerDateStr = getHeaderDateStr(now)
 
   return (
-    <div className="bg-surface-raised h-full p-10">
+    <div className="bg-surface min-h-full p-5 md:p-10">
       <div className="flex justify-between gap-2 flex-wrap items-center">
         <div>
           <h1 className="text-xl">{greeting}, {user.first_name}</h1>
@@ -57,18 +59,18 @@ function DashboardPage() {
           </p>
         </div>
         <div className="gap-3 hidden md:flex">
-          <Link to="expenses/scan" className="border border-border rounded-lg p-3 flex gap-2"> <Scan/> Scan receipt</Link>
+          <Link to="expenses/scan" className="border border-border bg-surface-raised rounded-lg p-3 flex gap-2"> <Scan/> Scan receipt</Link>
           <Link to="expenses/log" className="border border-border bg-primary text-background rounded-lg p-3 bg-linear-to-b from-primary to-primary-hover flex gap-2"> <Plus/> Log expense</Link>
         </div>
       </div>
       <BudgetOverview data={data}/>
-      <div className="gap-3 flex md:hidden">
-        <Link to="expenses/scan" className="border border-border rounded-lg p-3 flex gap-2 flex-1 items-center"> <Scan/> Scan receipt</Link>
+      <div className="gap-3 flex pb-5 md:hidden md:pb-0">
+        <Link to="expenses/scan" className="border border-border bg-surface-raised rounded-lg p-3 flex gap-2 flex-1 items-center"> <Scan/> Scan receipt</Link>
         <Link to="expenses/log" className="border border-border bg-primary text-background rounded-lg p-3 bg-linear-to-tl from-primary to-primary-hover  flex gap-2 flex-1 items-center">
           <Plus/>Log expense
         </Link>
       </div>
-      
+      <BarChart/>
     </div>
   )
 }

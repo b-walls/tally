@@ -40,15 +40,15 @@ function BudgetOverview({ data }) {
 
   return (
     <>
-    <div className='gap-5 py-10 hidden md:flex'>
-      <div className='flex flex-col flex-1 border bg-surface border-border rounded-lg p-5 shadow-sm'>
+    <div className='gap-5 my-3 hidden md:flex'>
+      <div className='flex flex-col flex-1 border bg-surface-raised border-border rounded-lg p-5 shadow-sm'>
         <p className='mb-1 text-text-muted'>Spent this month</p>
         <div>
           <h1 className="text-[clamp(2rem,3vw,5rem)]">${totalSpent}</h1>
           <p className='text-text-muted'>of ${totalBudget} budget</p>
         </div>
       </div>
-      <div className='flex flex-col justify-between flex-1 border bg-surface border-border rounded-lg p-5 shadow-sm'>
+      <div className='flex flex-col justify-between flex-1 border bg-surface-raised border-border rounded-lg p-5 shadow-sm'>
         <p className='mb-1 text-text-muted'>Remaining</p>
         {
           totalRemaining > 0 ? 
@@ -64,7 +64,7 @@ function BudgetOverview({ data }) {
         }
         
       </div>
-      <div className='flex flex-col flex-1 border bg-surface border-border rounded-lg p-5 shadow-sm'>
+      <div className='flex flex-col flex-1 border bg-surface-raised border-border rounded-lg p-5 shadow-sm'>
         <p className='mb-1 text-text-muted'>Largest category</p>
         <div>
           <h1 className="text-[clamp(2rem,3vw,5rem)]">{largestCategory.category}</h1>
@@ -72,8 +72,8 @@ function BudgetOverview({ data }) {
         </div>
       </div>
     </div>
-    <div className='py-5'>
-        <div className='flex flex-col md:hidden bg-surface rounded-2xl p-5 border border-border shadow-md'>
+    <div className='py-5 md:py-0'>
+        <div className='flex flex-col md:hidden bg-surface-raised rounded-2xl p-5 border border-border shadow-md'>
           <h2 className='text-primary uppercase'>Remaining this month</h2>
           {totalRemaining > 0 ? <h1 className='text-[clamp(2rem,3vw,5rem)] text-success'>${totalRemaining}</h1> : <h1 className='text-[clamp(2rem,3vw,5rem)] text-danger'>-${totalRemaining * -1}</h1>}
           <p className='text-text-muted mb-3'>of ${totalBudget} budget</p>
