@@ -47,10 +47,10 @@ def get_remaining_budget(request, username: str | None = None):
         remaining = budget.limit - category_spending[curr_category]
         results.append(BudgetRemainingSchema(id=budget.id,
                                              category=curr_category,
-                                             limit=budget.limit,
-                                             remaining=remaining))
+                                             limit=float(budget.limit),
+                                             remaining=float(remaining)))
 
-    return Status(200, results)  
+    return Status(200, results)
 
 
 @budget_router.get("/", response={200: list[GetBudgetSchema]})
@@ -61,14 +61,9 @@ def get_budgets(request, username: str | None = None):
     if user.is_superuser and username is not None:
         user = User.objects.get(username=username)
     
-    budgets = Budget.objects.filter(user=user)
-    
-    results = []
-    for budget in budgets:
-        results.append(GetBudgetSchema(id=budget.id,
-                                       category=budget.category.name,
-                                       limit=budget.limit))
-    return Status(200, results)
+    budgets = Budget.objects.filter(user=user).select_related('category')
+
+    return Status(200, list(budgets))
 
 
 @budget_router.patch("/{id}", response={200: GetBudgetSchema, 403: Message})
@@ -83,4 +78,4 @@ def update_budget(request, id: int, payload: UpdateBudgetSchema):
     budget.limit = payload.limit
     budget.save()
 
-    return Status(200, GetBudgetSchema(id=budget.id, category=budget.category.name, limit=budget.limit))
+    return Status(200, budget)

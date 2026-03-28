@@ -1,6 +1,6 @@
 import logging
 import base64
-from datetime import datetime
+from datetime import datetime, date
 
 from PIL import Image
 
@@ -16,7 +16,7 @@ from openai import AsyncOpenAI, OpenAIError
 from dotenv import load_dotenv
 from asgiref.sync import sync_to_async
 
-from api.models import Category, CATEGORY_CHOICES, Receipt, ReceiptItem
+from api.models import Category, CATEGORY_CHOICES, Expense, Receipt, ReceiptItem
 from api.schema import Message, ScanResponse, ReceiptSchema, ReceiptItemSchema, UpdateReceiptItemSchema, UpdateReceiptSchema
 
 logger = logging.getLogger(__name__)
@@ -76,6 +76,17 @@ def parse_receipt_date(date_str: str):
         return None
 
 
+def build_receipt_schema(receipt: Receipt) -> ReceiptSchema:
+    items = ReceiptItem.objects.filter(receipt=receipt).select_related('category')
+    schema = ReceiptSchema.from_orm(receipt)
+    schema.items = [
+        ReceiptItemSchema(id=item.id, name=item.name, amount=item.amount,
+                          confirmed=item.confirmed, category=item.category.name)
+        for item in items
+    ]
+    return schema
+
+
 @receipt_router.post("/scan", response={200: ReceiptSchema, 400: Message, 422: Message, 502: Message, 500: Message})
 async def scan(request, file: File[UploadedFile]):
     base64_img = base64.b64encode(file.read()).decode("utf-8")
@@ -115,7 +126,7 @@ async def scan(request, file: File[UploadedFile]):
                                         date=parse_receipt_date(scanned_receipt.date),
                                         total=scanned_receipt.total)
 
-        receipt_item_schemas = []
+        receipt_items = []
         for item in scanned_receipt.items:
             category = await sync_to_async(list)(Category.objects.filter(user=user, name=item.category))
 
@@ -128,18 +139,12 @@ async def scan(request, file: File[UploadedFile]):
                                                                            category=category,
                                                                            name=item.name,
                                                                            amount=item.amount)
-            receipt_item_schemas.append(ReceiptItemSchema(name=item.name,
-                                                          category=category.name,
-                                                          amount=item.amount,
-                                                          confirmed=False,
-                                                          id=receipt_item.id))
+            receipt_items.append(ReceiptItemSchema(id=receipt_item.id, name=receipt_item.name,
+                                                    amount=receipt_item.amount, confirmed=receipt_item.confirmed,
+                                                    category=category.name))
 
-        receipt_schema = ReceiptSchema(merhcant=receipt.merchant,
-                            date=receipt.date.strftime("%Y-%m-%d"),
-                            total=receipt.total,
-                            created_at=receipt.created_at.strftime("%Y-%m-%d"),
-                            items=receipt_item_schemas,
-                            id=receipt.id)
+        receipt_schema = ReceiptSchema.from_orm(receipt)
+        receipt_schema.items = receipt_items
 
     except Exception as e:
         logger.error(f"Registration error: {e}")
@@ -173,23 +178,8 @@ def receipt_detail(request, id: int):
     if not (receipt.user.id == user.id or user.is_superuser):
         return Status(403, "Forbidden")
 
-    items = ReceiptItem.objects.filter(receipt=receipt)
-    receipt_items = []
-    for item in items:
-        receipt_items.append(ReceiptItemSchema(name=item.name,
-                                         category=item.category.name,
-                                         amount=item.amount,
-                                         confirmed=item.confirmed,
-                                         id=item.id))
+    return Status(200, build_receipt_schema(receipt))
 
-    receipt = ReceiptSchema(merhcant=receipt.merchant,
-                            date=receipt.date.strftime("%Y-%m-%d"),
-                            total=receipt.total,
-                            created_at=receipt.created_at.strftime("%Y-%m-%d"),
-                            items=receipt_items,
-                            id=id)
-
-    return Status(200, receipt)
 
 @receipt_router.patch("/{id}", response={200: ReceiptSchema, 403: Message, 422: Message})
 def update_receipt(request, id: int, payload: UpdateReceiptSchema):
@@ -205,30 +195,16 @@ def update_receipt(request, id: int, payload: UpdateReceiptSchema):
 
     if payload.date is not None:
         receipt.date = parse_receipt_date(payload.date)
-        if receipt.date == None:
+        if receipt.date is None:
             return Status(422, {"message": "Unprocessable input"})
 
     if payload.total is not None:
         receipt.total = payload.total
-    
+
     receipt.save()
-    items = ReceiptItem.objects.filter(receipt=receipt)
-    receipt_items = []
-    for item in items:
-        receipt_items.append(ReceiptItemSchema(name=item.name,
-                                         category=item.category.name,
-                                         amount=item.amount,
-                                         confirmed=item.confirmed,
-                                         id=item.id))
 
-    receipt = ReceiptSchema(merhcant=receipt.merchant,
-                            date=receipt.date.strftime("%Y-%m-%d"),
-                            total=receipt.total,
-                            created_at=receipt.created_at.strftime("%Y-%m-%d"),
-                            items=receipt_items,
-                            id=id)
+    return Status(200, build_receipt_schema(receipt))
 
-    return Status(200, receipt)
 
 @receipt_router.patch("/items/{id}", response={200: Message, 403: Message, 400: Message})
 def update_receipt_item(request, id: int, payload: UpdateReceiptItemSchema):
