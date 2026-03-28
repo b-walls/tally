@@ -1,6 +1,6 @@
 import React from 'react'
 
-function BudgetOverview({ data }) {
+function BudgetOverview({ data, loading }) {
 
   // get spent, remaining, total
   function getBudgetOverviewFromData(data) {
@@ -40,12 +40,14 @@ function BudgetOverview({ data }) {
 
   return (
     <>
-    <div className='gap-5 my-3 hidden md:flex'>
+    {loading ? <div></div> : 
+    <>
+    <div className='gap-3 my-3 hidden md:flex'>
       <div className='flex flex-col flex-1 border bg-surface-raised border-border rounded-lg p-5 shadow-sm'>
         <p className='mb-1 text-text-muted'>Spent this month</p>
         <div>
-          <h1 className="text-[clamp(2rem,3vw,5rem)]">${totalSpent}</h1>
-          <p className='text-text-muted'>of ${totalBudget} budget</p>
+          <h1 className="text-[clamp(2rem,3vw,5rem)]">${totalSpent.toFixed(2)}</h1>
+          <p className='text-text-muted'>of ${totalBudget.toFixed(2)} budget</p>
         </div>
       </div>
       <div className='flex flex-col justify-between flex-1 border bg-surface-raised border-border rounded-lg p-5 shadow-sm'>
@@ -53,12 +55,12 @@ function BudgetOverview({ data }) {
         {
           totalRemaining > 0 ? 
           <div>
-          <h1 className='text-success text-[clamp(2rem,3vw,5rem)]'>${totalRemaining}</h1> 
-          <p className='text-text-muted'>~ ${totalRemaining/tilNextMonth}/day left</p>
+          <h1 className='text-success text-[clamp(2rem,3vw,5rem)]'>${totalRemaining.toFixed(2)}</h1> 
+          <p className='text-text-muted'>~ ${(totalRemaining/tilNextMonth).toFixed(2)}/day left</p>
           </div>
           : 
           <div>
-          <h1 className='text-danger text-[clamp(2rem,3vw,5rem)]'>-${totalRemaining * -1}</h1>
+          <h1 className='text-danger text-[clamp(2rem,3vw,5rem)]'>-${(totalRemaining * -1).toFixed(2)}</h1>
           <p className='text-text-muted'>~ $0/day left</p>
           </div>
         }
@@ -68,24 +70,26 @@ function BudgetOverview({ data }) {
         <p className='mb-1 text-text-muted'>Largest category</p>
         <div>
           <h1 className="text-[clamp(2rem,3vw,5rem)]">{largestCategory.category}</h1>
-          <p className='text-text-muted'>${largestCategory.spent} spent</p>
+          <p className='text-text-muted'>${(largestCategory.spent).toFixed(2)} spent</p>
         </div>
       </div>
     </div>
     <div className='py-5 md:py-0'>
         <div className='flex flex-col md:hidden bg-surface-raised rounded-2xl p-5 border border-border shadow-md'>
           <h2 className='text-primary uppercase'>Remaining this month</h2>
-          {totalRemaining > 0 ? <h1 className='text-[clamp(2rem,3vw,5rem)] text-success'>${totalRemaining}</h1> : <h1 className='text-[clamp(2rem,3vw,5rem)] text-danger'>-${totalRemaining * -1}</h1>}
-          <p className='text-text-muted mb-3'>of ${totalBudget} budget</p>
-          <div className='bg-surface-raised rounded-md'>
-            <div className='bg-primary h-1 rounded-md' style={{width: totalBudget > 0 ? Math.min(100, (totalSpent / totalBudget) * 100) + "%" : "100%"}}/>
+          {totalRemaining > 0 ? <h1 className='text-[clamp(2rem,3vw,5rem)] text-success'>${totalRemaining.toFixed(2)}</h1> : <h1 className='text-[clamp(2rem,3vw,5rem)] text-danger'>-${(totalRemaining * -1).toFixed(2)}</h1>}
+          <p className='text-text-muted mb-3'>of ${totalBudget.toFixed(2)} budget</p>
+          <div className='bg-surface-raised-2 rounded-md mb-2'>
+            <div className='bg-primary h-3 rounded-md' style={{width: totalBudget > 0 ? Math.min(100, (totalSpent / totalBudget) * 100) + "%" : "100%"}}/>
           </div>
           <div className='flex justify-between'>
-            <p className='text-text-muted'>${totalSpent} spent</p>
-            {totalRemaining > 0 ? <p className='text-text-muted'>~ ${totalRemaining/tilNextMonth}/day left</p> : <p className='text-text-muted'>$0/day left</p>}
+            <p className='text-text-muted'>${totalSpent.toFixed(2)} spent</p>
+            {totalRemaining > 0 ? <p className='text-text-muted'>~ ${(totalRemaining/tilNextMonth).toFixed(2)}/day left</p> : <p className='text-text-muted'>$0/day left</p>}
           </div>
         </div>
     </div>
+    </>
+    } 
     </>
   )
 }

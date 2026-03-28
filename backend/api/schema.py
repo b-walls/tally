@@ -2,6 +2,7 @@ from typing import Optional
 from pydantic import EmailStr, BaseModel
 from ninja import Schema, ModelSchema
 from django.contrib.auth.models import User
+from datetime import date
 
 from api.models import Category, Expense, Receipt, Budget
 
@@ -114,6 +115,14 @@ class ExpenseSchema(ModelSchema):
         model = Expense
         fields = ['id', 'merchant', 'date', 'total', 'note']
 
-class ExpenseRange(Schema):
-    receipts: list[ReceiptSchema]
-    expenses: list[ExpenseSchema]
+class ExpenseMixSchema(Schema):
+    type: str
+    id: int
+    merchant: str
+    total: float
+    date: date
+
+# retired
+# class ExpenseRange(Schema):
+#     receipts: list[ReceiptSchema]
+#     expenses: list[ExpenseSchema]

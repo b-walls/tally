@@ -27,12 +27,12 @@ def get_remaining_budget(request, username: str | None = None):
 
     receipt_items = ReceiptItem.objects.filter(receipt__user=user,
                                                receipt__date__month=today.month,
-                                               receipt__date__year=today.year)
+                                               receipt__date__year=today.year).select_related('category')
     expenses = Expense.objects.filter(user=user,
                                       date__month=today.month,
-                                      date__year=today.year)
+                                      date__year=today.year).select_related('category')
 
-    budgets = Budget.objects.filter(user=user)
+    budgets = Budget.objects.filter(user=user).select_related('category')
 
     category_spending = defaultdict(int)
     for item in receipt_items:

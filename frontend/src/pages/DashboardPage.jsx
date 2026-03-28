@@ -1,32 +1,22 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getRemaining } from "../api/budget"; 
+
 import { useAuth } from "../contexts/AuthContext"
 import { Scan, Plus } from 'lucide-react'
 
-import BudgetOverview from "../components/BudgetOverview";
-import BarChart from "../components/BarChart"
+import BudgetOverview from "../components/dashboard/BudgetOverview";
+import BarChart from "../components/dashboard/BarChart"
+import BudgetStatus from "../components/dashboard/BudgetStatus";
+import RecentExpenses from "../components/dashboard/RecentExpenses";
+
+import { getExpenseRange, getExpenseRecent } from "../api/expense";
+import { getRemaining } from "../api/budget"; 
 
 function DashboardPage() {
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getRemaining();
-        setData(response);
-        console.log(response);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchData();
-    
-  }, [])
+  const [remaingBudgetData, setRemaingBudgetData] = useState([]);
+  const [expenseRangeData, setExpenseRangeData] = useState();
+  const [recentExpenseData, setRecentExpenseData] = useState();
 
   const { user } = useAuth();
   
@@ -47,7 +37,37 @@ function DashboardPage() {
 
   const now = new Date();
   const greeting = getGreeting(now);
-  const headerDateStr = getHeaderDateStr(now)
+  const headerDateStr = getHeaderDateStr(now);
+
+  const dayOfWeek = now.getDay();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - dayOfWeek);
+
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(endOfWeek.getDate() + 6);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const remaining = await getRemaining();
+        setRemaingBudgetData(remaining);
+
+        const expensesRange = await getExpenseRange(startOfWeek, endOfWeek);
+        const expensesRangeObj = {startDate: startOfWeek, endDate: endOfWeek, data: expensesRange}
+        setExpenseRangeData(expensesRangeObj);
+
+        const recentExpence = await getExpenseRecent();
+        setRecentExpenseData(recentExpence);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+    
+  }, [])
 
   return (
     <div className="bg-surface min-h-full p-5 md:p-10">
@@ -63,14 +83,18 @@ function DashboardPage() {
           <Link to="expenses/log" className="border border-border bg-primary text-background rounded-lg p-3 bg-linear-to-b from-primary to-primary-hover flex gap-2"> <Plus/> Log expense</Link>
         </div>
       </div>
-      <BudgetOverview data={data}/>
+      <BudgetOverview data={remaingBudgetData} loading={loading}/>
       <div className="gap-3 flex pb-5 md:hidden md:pb-0">
         <Link to="expenses/scan" className="border border-border bg-surface-raised rounded-lg p-3 flex gap-2 flex-1 items-center"> <Scan/> Scan receipt</Link>
         <Link to="expenses/log" className="border border-border bg-primary text-background rounded-lg p-3 bg-linear-to-tl from-primary to-primary-hover  flex gap-2 flex-1 items-center">
           <Plus/>Log expense
         </Link>
       </div>
-      <BarChart/>
+      <div className="flex flex-col md:flex-row gap-3 mb-3">
+        <BarChart data={expenseRangeData} loading={loading}/>
+        <BudgetStatus data={remaingBudgetData} loading={loading}/>
+      </div>
+      <RecentExpenses data={recentExpenseData} loading={loading}/>
     </div>
   )
 }
