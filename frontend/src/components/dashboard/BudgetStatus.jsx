@@ -4,7 +4,7 @@ const COLORS = {primary: "#a78bfa", textDanger: "#f87171", text: "#f5f5f5", succ
 
 function Bar({item}) {
   const spent = item.limit - item.remaining;
-  const width = Math.max(3, Math.min(100, ((spent) / item.remaining * 100)))
+  const width = Math.max(3, Math.min(100, ((spent) / item.limit * 100)))
   const barColor = item.remaining <= 0 ? "red" : COLORS.primary;
   const textColor = item.remaining <= 0 ? COLORS.textDanger : COLORS.textMuted;
 
@@ -33,7 +33,7 @@ function BudgetBars({data, loading}) {
   
   return (
     <div className='flex flex-col flex-1 bg-surface-raised border border-border rounded-lg p-4 gap-2'>
-      <h1 className='text-xl mb-3'>Budget status</h1>
+      <h1 className='text-2xl mb-3'>Budget status</h1>
       {
       loading ? 
         <p>loading...</p> 

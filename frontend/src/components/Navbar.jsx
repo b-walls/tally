@@ -41,12 +41,12 @@ function Navbar() {
         <div className="flex-col bg-background px-4 pt-10 pb-5 border-r border-border h-screen hidden md:flex justify-between">
             <div>
                 <div className='flex flex-row items-center'>
-                    <img src={tally_icon_32} alt="Tally logo" />
+                    {/* <img src={tally_icon_32} alt="Tally logo" /> */}
                     <h1 className="text-[clamp(1.5rem,3vw,1.5rem)] font-extrabold tracking-tight">
                         Tally
                     </h1>
                 </div>
-                <p className='text-[clamp(0.75rem,3vw,0.75rem)] text-text-muted uppercase mt-1 ml-1 tracking-tight'>Budget & Expense Tracking</p>
+                <p className='text-[clamp(0.75rem,3vw,0.75rem)] text-text-muted uppercase mt-1 tracking-tight'>Budget & Expense Tracking</p>
 
                 <div className="flex flex-col mt-10">
                     <NavLinkCol to="/dashboard" text="Dashboard" icon={House} selected={currSelected === '/'}/>

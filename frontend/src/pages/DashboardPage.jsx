@@ -32,7 +32,7 @@ function DashboardPage() {
     const tilNextMonth = Math.floor((firstDayNextMonth - now) / 1000 / 60 / 60 / 24)
 
     return (now.toLocaleDateString('default', { month: 'long', year: 'numeric' }) 
-      + " • " + tilNextMonth + " days left") 
+      + " · " + tilNextMonth + " days left") 
   }
 
   const now = new Date();
@@ -70,8 +70,8 @@ function DashboardPage() {
   }, [])
 
   return (
-    <div className="bg-surface min-h-full p-5 md:p-10">
-      <div className="flex justify-between gap-2 flex-wrap items-center">
+    <div className="bg-surface min-h-full p-5 md:p-10 flex flex-col select-none">
+      <div className="flex justify-between gap-2 flex-wrap items-center md:mb-2">
         <div>
           <h1 className="text-xl">{greeting}, {user.first_name}</h1>
           <p className="text-text-muted">
@@ -79,8 +79,8 @@ function DashboardPage() {
           </p>
         </div>
         <div className="gap-3 hidden md:flex">
-          <Link to="expenses/scan" className="border border-border bg-surface-raised rounded-lg p-3 flex gap-2"> <Scan/> Scan receipt</Link>
-          <Link to="expenses/log" className="border border-border bg-primary text-background rounded-lg p-3 bg-linear-to-b from-primary to-primary-hover flex gap-2"> <Plus/> Log expense</Link>
+          <Link to="expenses/scan" className="border border-border bg-surface-raised rounded-lg p-3 flex gap-2 transition-all duration-300 hover:bg-surface-raised-2"> <Scan/> Scan receipt</Link>
+          <Link to="expenses/log" className="border border-border bg-primary text-background rounded-lg p-3 flex gap-2 transition-all duration-300 hover:bg-primary/80"> <Plus/> Log expense</Link>
         </div>
       </div>
       <BudgetOverview data={remaingBudgetData} loading={loading}/>

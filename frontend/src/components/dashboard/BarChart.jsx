@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import { sameDay } from '../../utils/date'
 
 const DAY_LETTERS = ["S", "M", "T", "W", "T", "F", "S"];
 const COLORS = {primary: "#a78bfa", surfaceRaised2: "#2e2e2e", border: "#333333"}
@@ -16,11 +17,6 @@ function getWeekRange() {
   return [startOfWeek, endOfWeek, dayOfWeek];
 }
 
-function sameDay(d1, d2) {
-  return d1.getFullYear() === d2.getFullYear() &&
-        d1.getMonth() === d2.getMonth() &&
-        d1.getDate() === d2.getDate();
-}
 
 function extractDailyTotals(data) {
   const dailyTotals = []
@@ -105,7 +101,7 @@ function BarChart( {data, loading} ) {
   return (
     <div className='flex flex-col flex-1 border bg-surface-raised border-border p-4 rounded-lg justify-between'>
       <div>
-        <h1 className='text-xl'>Daily spending</h1>
+        <h1 className='text-2xl'>Daily spending</h1>
         <p className='text-text-muted text-shadow-sm text-shadow-surface'>
           {startOfWeek.toLocaleDateString('default', { month: 'short', day: 'numeric' }) } - {endOfWeek.toLocaleDateString('default', { month: 'short', day: 'numeric' }) }
         </p>

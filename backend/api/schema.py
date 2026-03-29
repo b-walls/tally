@@ -121,6 +121,7 @@ class ExpenseMixSchema(Schema):
     merchant: str
     total: float
     date: date
+    category: str
 
 # retired
 # class ExpenseRange(Schema):

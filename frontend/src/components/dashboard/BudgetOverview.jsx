@@ -43,35 +43,33 @@ function BudgetOverview({ data, loading }) {
     {loading ? <div></div> : 
     <>
     <div className='gap-3 my-3 hidden md:flex'>
-      <div className='flex flex-col flex-1 border bg-surface-raised border-border rounded-lg p-5 shadow-sm'>
+      <div className='flex flex-col flex-1 border-t-2 border-t-primary border border-border bg-surface-raised rounded-lg p-5 shadow-sm'>
         <p className='mb-1 text-text-muted'>Spent this month</p>
         <div>
           <h1 className="text-[clamp(2rem,3vw,5rem)]">${totalSpent.toFixed(2)}</h1>
           <p className='text-text-muted'>of ${totalBudget.toFixed(2)} budget</p>
         </div>
       </div>
-      <div className='flex flex-col justify-between flex-1 border bg-surface-raised border-border rounded-lg p-5 shadow-sm'>
+      <div className='flex flex-col justify-evenly flex-1 border-t-2 border border-border bg-surface-raised rounded-lg p-5 shadow-sm' style={{borderTopColor: totalRemaining > 0 ? 'var(--color-success)' : 'var(--color-danger)'}}>
         <p className='mb-1 text-text-muted'>Remaining</p>
         {
-          totalRemaining > 0 ? 
-          <div>
-          <h1 className='text-success text-[clamp(2rem,3vw,5rem)]'>${totalRemaining.toFixed(2)}</h1> 
+          totalRemaining > 0 ?
+          <>
+          <h1 className='text-success text-[clamp(2rem,3vw,5rem)]'>${totalRemaining.toFixed(2)}</h1>
           <p className='text-text-muted'>~ ${(totalRemaining/tilNextMonth).toFixed(2)}/day left</p>
-          </div>
-          : 
-          <div>
+          </>
+          :
+          <>
           <h1 className='text-danger text-[clamp(2rem,3vw,5rem)]'>-${(totalRemaining * -1).toFixed(2)}</h1>
           <p className='text-text-muted'>~ $0/day left</p>
-          </div>
+          </>
         }
-        
+
       </div>
-      <div className='flex flex-col flex-1 border bg-surface-raised border-border rounded-lg p-5 shadow-sm'>
+      <div className='flex flex-col flex-1 justify-evenly border-t-2 border-t-blue-400 border border-border bg-surface-raised rounded-lg p-5 shadow-sm'>
         <p className='mb-1 text-text-muted'>Largest category</p>
-        <div>
-          <h1 className="text-[clamp(2rem,3vw,5rem)]">{largestCategory.category}</h1>
-          <p className='text-text-muted'>${(largestCategory.spent).toFixed(2)} spent</p>
-        </div>
+        <h1 className="text-[clamp(2rem,3vw,5rem)]">{largestCategory.category}</h1>
+        <p className='text-text-muted'>${(largestCategory.spent).toFixed(2)} spent</p>
       </div>
     </div>
     <div className='py-5 md:py-0'>
