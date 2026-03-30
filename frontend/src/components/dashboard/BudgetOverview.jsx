@@ -1,42 +1,50 @@
-import React from 'react'
+import React, {useMemo} from 'react'
+// get spent, remaining, total
+function getBudgetOverviewFromData(data) {
+
+  const totals = data.reduce((accum, item) => {
+    accum[0] += parseFloat(item.limit);
+    accum[1] += parseFloat(item.remaining);
+    return accum
+  }, [0, 0]);
+
+  const [totalBudget, totalRemaining] = totals
+  const totalSpent = totalBudget - totalRemaining;
+
+  return [totalSpent, totalRemaining, totalBudget];
+}
+
+function getLargestCategory(data) {
+  const largest = {category: "", spent: -Infinity}
+
+  data.forEach((item) => {
+    const currNum = parseFloat(item.limit) - parseFloat(item.remaining);
+    if (currNum > largest.spent) {
+      largest.category = item.category;
+      largest.spent = currNum;
+    }
+  })
+  
+  return largest
+}
+
+const now = new Date();
+const firstDayNextMonth = new Date(now.getFullYear(), (now.getMonth() + 1 % 12), 1)
+const tilNextMonth = Math.floor((firstDayNextMonth - now) / 1000 / 60 / 60 / 24)
 
 function BudgetOverview({ data, loading }) {
 
-  // get spent, remaining, total
-  function getBudgetOverviewFromData(data) {
+  // const [totalSpent, totalRemaining, totalBudget, large] = getBudgetOverviewFromData(data);
+  // const largestCategory = getLargestCategory(data);
 
-    const totals = data.reduce((accum, item) => {
-      accum[0] += parseFloat(item.limit);
-      accum[1] += parseFloat(item.remaining);
-      return accum
-    }, [0, 0]);
-
-    const [totalBudget, totalRemaining] = totals
-    const totalSpent = totalBudget - totalRemaining;
-
-    return [totalSpent, totalRemaining, totalBudget];
-  }
-
-  function getLargestCategory(data) {
-    const largest = {category: "", spent: -Infinity}
-
-    data.forEach((item) => {
-      const currNum = parseFloat(item.limit) - parseFloat(item.remaining);
-      if (currNum > largest.spent) {
-        largest.category = item.category;
-        largest.spent = currNum;
-      }
-    })
+   const [totalSpent, totalRemaining, totalBudget, largestCategory] = useMemo(() => {
+      if (loading) return [];
+      const [totalSpent, totalRemaining, totalBudget] = getBudgetOverviewFromData(data);
+      const largestCategory = getLargestCategory(data);
+      return [...getBudgetOverviewFromData(data), getLargestCategory(data)]
+    }, [data, loading]);
     
-    return largest
-  }
-  
-  const now = new Date();
-  const firstDayNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
-  const tilNextMonth = Math.floor((firstDayNextMonth - now) / 1000 / 60 / 60 / 24)
-
-  const [totalSpent, totalRemaining, totalBudget] = getBudgetOverviewFromData(data);
-  const largestCategory = getLargestCategory(data);
+    
 
   return (
     <>

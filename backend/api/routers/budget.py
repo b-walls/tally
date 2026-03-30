@@ -6,6 +6,7 @@ from ninja import Router, Status
 from api.auth import SessionAuth
 
 from django.contrib.auth.models import User
+from django.db.models import Sum
 
 from api.models import ReceiptItem, Budget, UserSettings, Category, Expense
 from api.schema import GetBudgetSchema, BudgetRemainingSchema, UpdateBudgetSchema, Message
@@ -13,6 +14,13 @@ from api.schema import GetBudgetSchema, BudgetRemainingSchema, UpdateBudgetSchem
 logger = logging.getLogger(__name__)
 
 budget_router = Router(auth=SessionAuth())
+
+def get_period_start(period):
+    today = date.today()
+    if period == "weekly":
+        return today - timedelta(days=today.weekday() + 1)
+    else:
+        return today.replace(day=1)
 
 
 @budget_router.get("/remaining", response={200: list[BudgetRemainingSchema]})
@@ -22,33 +30,47 @@ def get_remaining_budget(request, username: str | None = None):
 
     if user.is_superuser and username is not None:
         user = User.objects.get(username=username)
-
-    today = date.today()
-
-    receipt_items = ReceiptItem.objects.filter(receipt__user=user,
-                                               receipt__date__month=today.month,
-                                               receipt__date__year=today.year).select_related('category')
-    expenses = Expense.objects.filter(user=user,
-                                      date__month=today.month,
-                                      date__year=today.year).select_related('category')
-
-    budgets = Budget.objects.filter(user=user).select_related('category')
-
-    category_spending = defaultdict(int)
-    for item in receipt_items:
-        category_spending[item.category.name] += item.amount
     
-    for item in expenses:
-        category_spending[item.category.name] += item.total
-
+    today = date.today()
+    budgets = Budget.objects.filter(user=user).select_related('category')
     results = []
     for budget in budgets:
-        curr_category = budget.category.name
-        remaining = budget.limit - category_spending[curr_category]
+        period_start = get_period_start(budget.period)
+        total = ReceiptItem.objects.filter(receipt__user=user,
+                                                   receipt__date__range=(period_start, today),
+                                                   category=budget.category).aggregate(Sum("amount", default=0))['amount__sum']
+        total += Expense.objects.filter(user=user,
+                                        date__range=(period_start, today),
+                                        category=budget.category).aggregate(Sum("total", default=0))['total__sum']
+        
         results.append(BudgetRemainingSchema(id=budget.id,
-                                             category=curr_category,
+                                             category=budget.category.name,
                                              limit=float(budget.limit),
-                                             remaining=float(remaining)))
+                                             remaining=float(budget.limit - total),
+                                             period=budget.period))
+        
+    # receipt_items = ReceiptItem.objects.filter(receipt__user=user,
+    #                                            receipt__date__month=today.month,
+    #                                            receipt__date__year=today.year).select_related('category')
+    # expenses = Expense.objects.filter(user=user,
+    #                                   date__month=today.month,
+    #                                   date__year=today.year).select_related('category')
+
+    # category_spending = defaultdict(int)
+    # for item in receipt_items:
+    #     category_spending[item.category.name] += item.amount
+    
+    # for item in expenses:
+    #     category_spending[item.category.name] += item.total
+
+    # results = []
+    # for budget in budgets:
+    #     curr_category = budget.category.name
+    #     remaining = budget.limit - category_spending[curr_category]
+    #     results.append(BudgetRemainingSchema(id=budget.id,
+    #                                          category=curr_category,
+    #                                          limit=float(budget.limit),
+    #                                          remaining=float(remaining)))
 
     return Status(200, results)
 
@@ -75,7 +97,11 @@ def update_budget(request, id: int, payload: UpdateBudgetSchema):
     if not (budget.user == user or user.is_superuser):
         return Status(403, "Unauthorized")
 
-    budget.limit = payload.limit
+    if budget.limit is not None:
+        budget.limit = payload.limit
+    if budget.period is not None:
+        budget.period = payload.period
+
     budget.save()
 
     return Status(200, budget)

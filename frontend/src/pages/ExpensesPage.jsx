@@ -139,7 +139,7 @@ export default function ReceiptsPage() {
           <p>loading...</p>
         ) : (
           expenses.map((expense, index) => (
-            <div key={index} className="bg-surface-raised-2">{expense.merchant} - {expense.total}</div>
+            <div key={index} className="bg-surface-raised-2">{expense.merchant} - ${expense.total.toFixed(2)}</div>
           ))
         )}
       </div>

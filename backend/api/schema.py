@@ -89,7 +89,7 @@ class GetBudgetSchema(ModelSchema):
 
     class Meta:
         model = Budget
-        fields = ['id', 'limit']
+        fields = ['id', 'limit', 'period']
 
 
 class BudgetRemainingSchema(Schema):
@@ -97,10 +97,12 @@ class BudgetRemainingSchema(Schema):
     category: str
     limit: float
     remaining: float
+    period: str
 
 
 class UpdateBudgetSchema(Schema):
     limit: float
+    period: str
 
 
 # ------- Expense ----------

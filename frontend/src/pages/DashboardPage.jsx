@@ -11,6 +11,29 @@ import RecentExpenses from "../components/dashboard/RecentExpenses";
 
 import { getExpenseRange, getExpenseRecent } from "../api/expense";
 import { getRemaining } from "../api/budget"; 
+import { getWeekRange } from "../utils/date";
+
+const [startOfWeek, endOfWeek] = getWeekRange();
+
+const getGreeting = () => {
+  const now = new Date();
+  const hour = now.getHours();
+  if (hour > 4 && hour < 12) return "Good morning";
+  if (hour <= 17) return "Good afternoon";
+  return "Good evening";
+};
+
+const getHeaderDateStr = () => {
+  const now = new Date();
+  const firstDayNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+  const tilNextMonth = Math.floor((firstDayNextMonth - now) / 1000 / 60 / 60 / 24)
+
+  return (now.toLocaleDateString('default', { month: 'long', year: 'numeric' }) 
+    + " · " + tilNextMonth + " days left") 
+}
+
+const headerDateStr = getHeaderDateStr();
+const greeting = getGreeting();
 
 function DashboardPage() {
   const [loading, setLoading] = useState(true);
@@ -19,32 +42,6 @@ function DashboardPage() {
   const [recentExpenseData, setRecentExpenseData] = useState();
 
   const { user } = useAuth();
-  
-  const getGreeting = (now) => {
-    const hour = now.getHours();
-    if (hour > 4 && hour < 12) return "Good morning";
-    if (hour <= 17) return "Good afternoon";
-    return "Good evening";
-  };
-
-  const getHeaderDateStr = (now) => {
-    const firstDayNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
-    const tilNextMonth = Math.floor((firstDayNextMonth - now) / 1000 / 60 / 60 / 24)
-
-    return (now.toLocaleDateString('default', { month: 'long', year: 'numeric' }) 
-      + " · " + tilNextMonth + " days left") 
-  }
-
-  const now = new Date();
-  const greeting = getGreeting(now);
-  const headerDateStr = getHeaderDateStr(now);
-
-  const dayOfWeek = now.getDay();
-  const startOfWeek = new Date(now);
-  startOfWeek.setDate(now.getDate() - dayOfWeek);
-
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(endOfWeek.getDate() + 6);
 
   useEffect(() => {
     const fetchData = async () => {
