@@ -4,8 +4,8 @@ import { ArrowRight } from 'lucide-react'
 import { sameDay } from '../../utils/date'
 
 function extractRecent(data) {
-	const maxIndex = Math.min(data.length, 5)
-	return data.slice(0, maxIndex);
+	const maxIndex = Math.min(data.data.length, 5)
+	return data.data.reverse().slice(0, maxIndex);
 }
 
 function getDayString(item) {

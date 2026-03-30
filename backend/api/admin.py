@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Receipt, ReceiptItem, Budget, Category, Expense
+from .models import Receipt, Budget, Category, Expense
 
 # Register your models here.
-admin.site.register([Receipt, ReceiptItem, Budget, Category, Expense])
+admin.site.register([Receipt, Budget, Category, Expense])

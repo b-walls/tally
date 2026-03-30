@@ -30,11 +30,7 @@ class Category(models.Model):
 class Receipt(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to="receipts/")
-    merchant = models.CharField(max_length=50, blank=True)
-    date = models.DateField(null=True)
-    total = models.DecimalField(max_digits=8, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
-    
         
     def __str__(self):
         return f"{self.user.username} | {self.id}"
@@ -42,11 +38,10 @@ class Receipt(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=['user']),
-            models.Index(fields=['user', 'date']),
         ]
 
-class ReceiptItem(models.Model):
-    receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE)
+class ExpenseItem(models.Model):
+    expense = models.ForeignKey("Expense", on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     name = models.CharField(max_length=200)
     amount = models.DecimalField(max_digits=8, decimal_places=2)
@@ -61,6 +56,7 @@ class ReceiptItem(models.Model):
 
 class Expense(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE, null=True)
     merchant = models.CharField(max_length=50, blank=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     date = models.DateField()
@@ -73,6 +69,7 @@ class Expense(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=['category']),
+            models.Index(fields=['user', 'date']),
         ]
 
 class Budget(models.Model):

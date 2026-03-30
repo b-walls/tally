@@ -1,5 +1,6 @@
 import logging
 import base64
+from collections import defaultdict
 from datetime import datetime, date
 
 from PIL import Image
@@ -8,7 +9,6 @@ from ninja import Router, Status, File
 from ninja.files import UploadedFile
 from api.auth import SessionAuth
 
-from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse, HttpResponseForbidden
 
@@ -16,8 +16,8 @@ from openai import AsyncOpenAI, OpenAIError
 from dotenv import load_dotenv
 from asgiref.sync import sync_to_async
 
-from api.models import Category, CATEGORY_CHOICES, Expense, Receipt, ReceiptItem
-from api.schema import Message, ScanResponse, ReceiptSchema, ReceiptItemSchema, UpdateReceiptItemSchema, UpdateReceiptSchema
+from api.models import Category, CATEGORY_CHOICES, Expense, Receipt
+from api.schema import Message, ScanResponse, ReceiptSchema, ScanResultSchema, ExpenseMixSchema
 
 logger = logging.getLogger(__name__)
 
@@ -76,18 +76,7 @@ def parse_receipt_date(date_str: str):
         return None
 
 
-def build_receipt_schema(receipt: Receipt) -> ReceiptSchema:
-    items = ReceiptItem.objects.filter(receipt=receipt).select_related('category')
-    schema = ReceiptSchema.from_orm(receipt)
-    schema.items = [
-        ReceiptItemSchema(id=item.id, name=item.name, amount=item.amount,
-                          confirmed=item.confirmed, category=item.category.name)
-        for item in items
-    ]
-    return schema
-
-
-@receipt_router.post("/scan", response={200: ReceiptSchema, 400: Message, 422: Message, 502: Message, 500: Message})
+@receipt_router.post("/scan", response={200: ScanResultSchema, 400: Message, 422: Message, 502: Message, 500: Message})
 async def scan(request, file: File[UploadedFile]):
     base64_img = base64.b64encode(file.read()).decode("utf-8")
 
@@ -120,42 +109,44 @@ async def scan(request, file: File[UploadedFile]):
         return Status(422, {'message': 'Could not extract receipt data'})
 
     try:
-        receipt = await sync_to_async(Receipt.objects.create)(user=user,
-                                        image=file,
-                                        merchant=scanned_receipt.merchant,
-                                        date=parse_receipt_date(scanned_receipt.date),
-                                        total=scanned_receipt.total)
+        receipt = await sync_to_async(Receipt.objects.create)(user=user, image=file)
 
-        receipt_items = []
+        groups = defaultdict(float)
         for item in scanned_receipt.items:
-            category = await sync_to_async(list)(Category.objects.filter(user=user, name=item.category))
+            groups[item.category] += item.amount
 
-            if len(category) == 0:
+        receipt_date = parse_receipt_date(scanned_receipt.date) or date.today()
+        created_expenses = []
+
+        for category_name, total in groups.items():
+            category = await sync_to_async(
+                Category.objects.filter(user=user, name=category_name).first
+            )()
+            if category is None:
                 category = await sync_to_async(Category.objects.get)(user=user, name="Other")
-            else:
-                category = category[0]
 
-            receipt_item = await sync_to_async(ReceiptItem.objects.create)(receipt=receipt,
-                                                                           category=category,
-                                                                           name=item.name,
-                                                                           amount=item.amount)
-            receipt_items.append(ReceiptItemSchema(id=receipt_item.id, name=receipt_item.name,
-                                                    amount=receipt_item.amount, confirmed=receipt_item.confirmed,
-                                                    category=category.name))
-
-        receipt_schema = ReceiptSchema.from_orm(receipt)
-        receipt_schema.items = receipt_items
+            expense = await sync_to_async(Expense.objects.create)(
+                user=user,
+                receipt=receipt,
+                merchant=scanned_receipt.merchant,
+                category=category,
+                date=receipt_date,
+                total=round(total, 2),
+            )
+            created_expenses.append(
+                ExpenseMixSchema(id=expense.id, merchant=expense.merchant, total=float(expense.total),
+                                 date=expense.date, category=category.name, receipt_id=receipt.id)
+            )
 
     except Exception as e:
-        logger.error(f"Registration error: {e}")
+        logger.error(f"Scan error: {e}")
         return Status(500, {'message': 'An unexpected error occurred'})
 
-    return Status(200, receipt_schema)
+    return Status(200, ScanResultSchema(receipt_id=receipt.id, expenses=created_expenses))
 
 
 @receipt_router.get("/{id}/image")
 def get_receipt_image(request, id: int):
-    """gets the image for a receipt"""
     user = request.user
     receipt = get_object_or_404(Receipt, id=id)
 
@@ -171,73 +162,16 @@ def get_receipt_image(request, id: int):
 
 @receipt_router.get("/{id}", response={200: ReceiptSchema, 403: Message})
 def receipt_detail(request, id: int):
-    """gets a receipt by id (including items)"""
     user = request.user
     receipt = get_object_or_404(Receipt, id=id)
 
     if not (receipt.user.id == user.id or user.is_superuser):
         return Status(403, "Forbidden")
 
-    return Status(200, build_receipt_schema(receipt))
-
-
-@receipt_router.patch("/{id}", response={200: ReceiptSchema, 403: Message, 422: Message})
-def update_receipt(request, id: int, payload: UpdateReceiptSchema):
-    """update a receipt by id"""
-    user = request.user
-    receipt = get_object_or_404(Receipt, id=id)
-
-    if not (receipt.user.id == user.id or user.is_superuser):
-        return Status(403, "Forbidden")
-
-    if payload.merchant is not None:
-        receipt.merchant = payload.merchant
-
-    if payload.date is not None:
-        receipt.date = parse_receipt_date(payload.date)
-        if receipt.date is None:
-            return Status(422, {"message": "Unprocessable input"})
-
-    if payload.total is not None:
-        receipt.total = payload.total
-
-    receipt.save()
-
-    return Status(200, build_receipt_schema(receipt))
-
-
-@receipt_router.patch("/items/{id}", response={200: Message, 403: Message, 400: Message})
-def update_receipt_item(request, id: int, payload: UpdateReceiptItemSchema):
-    receipt_item = get_object_or_404(ReceiptItem, id=id)
-
-    if not (request.user == receipt_item.receipt.user or request.user.is_superuser):
-        return Status(403, {"message": "Forbidden."})
-
-    user = request.user
-
-    if user.is_superuser and payload.username is not None:
-        user = User.objects.get(username=payload.username)
-
-    if payload.category is not None:
-        category_str = payload.category
-
-        try:
-            category = Category.objects.get(name=category_str, user=request.user)
-        except Category.DoesNotExist:
-            return Status(400, {"message": "Category does not exist."})
-        except Category.MultipleObjectsReturned:
-            return Status(400, {"message": "Multiple categories of the same name found."})
-
-        receipt_item.category = category
-
-    if payload.amount is not None:
-        receipt_item.amount = payload.amount
-
-    if payload.name is not None:
-        receipt_item.name = payload.name
-
-    if payload.confirmed is not None:
-        receipt_item.confirmed = payload.confirmed
-
-    receipt_item.save()
-    return Status(200, {"message": "receipt item updated"})
+    schema = ReceiptSchema.from_orm(receipt)
+    schema.expenses = [
+        ExpenseMixSchema(id=e.id, merchant=e.merchant, total=float(e.total),
+                         date=e.date, category=e.category.name, receipt_id=receipt.id)
+        for e in receipt.expense_set.select_related('category')
+    ]
+    return Status(200, schema)

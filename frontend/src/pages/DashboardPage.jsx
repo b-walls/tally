@@ -11,9 +11,10 @@ import RecentExpenses from "../components/dashboard/RecentExpenses";
 
 import { getExpenseRange, getExpenseRecent } from "../api/expense";
 import { getRemaining } from "../api/budget"; 
-import { getWeekRange } from "../utils/date";
+import { getWeekRange, getMonthRange } from "../utils/date";
 
 const [startOfWeek, endOfWeek] = getWeekRange();
+const [startOfMonth, endOfMonth] = getMonthRange();
 
 const getGreeting = () => {
   const now = new Date();
@@ -38,23 +39,23 @@ const greeting = getGreeting();
 function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [remaingBudgetData, setRemaingBudgetData] = useState([]);
-  const [expenseRangeData, setExpenseRangeData] = useState();
-  const [recentExpenseData, setRecentExpenseData] = useState();
+  const [expenseWeekRangeData, setExpenseWeekRangeData] = useState();
+  const [expenseMonthRangeData, setExpenseMonthRangeData] = useState();
 
   const { user } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const remaining = await getRemaining();
+        const [remaining, expensesWeekRange, expensesMonthRange] = await Promise.all([
+          getRemaining(),
+          getExpenseRange(startOfWeek, endOfWeek),
+          getExpenseRange(startOfMonth, endOfMonth),
+        ]);
+
         setRemaingBudgetData(remaining);
-
-        const expensesRange = await getExpenseRange(startOfWeek, endOfWeek);
-        const expensesRangeObj = {startDate: startOfWeek, endDate: endOfWeek, data: expensesRange}
-        setExpenseRangeData(expensesRangeObj);
-
-        const recentExpence = await getExpenseRecent();
-        setRecentExpenseData(recentExpence);
+        setExpenseWeekRangeData({startDate: startOfWeek, endDate: endOfWeek, data: expensesWeekRange});
+        setExpenseMonthRangeData({startDate: startOfMonth, endDate: endOfMonth, data: expensesMonthRange});
       } catch (error) {
         console.error(error);
       } finally {
@@ -80,7 +81,7 @@ function DashboardPage() {
           <Link to="expenses/log" className="border border-border bg-primary text-background rounded-lg p-3 flex gap-2 transition-all duration-300 hover:bg-primary/80"> <Plus/> Log expense</Link>
         </div>
       </div>
-      <BudgetOverview data={remaingBudgetData} loading={loading}/>
+      <BudgetOverview data={{budget: remaingBudgetData, expenses: expenseMonthRangeData}} loading={loading}/>
       <div className="gap-3 flex pb-5 md:hidden md:pb-0">
         <Link to="expenses/scan" className="border border-border bg-surface-raised rounded-lg p-3 flex gap-2 flex-1 items-center"> <Scan/> Scan receipt</Link>
         <Link to="expenses/log" className="border border-border bg-primary text-background rounded-lg p-3 bg-linear-to-tl from-primary to-primary-hover  flex gap-2 flex-1 items-center">
@@ -88,10 +89,10 @@ function DashboardPage() {
         </Link>
       </div>
       <div className="flex flex-col md:flex-row gap-3 mb-3">
-        <BarChart data={expenseRangeData} loading={loading}/>
+        <BarChart data={expenseWeekRangeData} loading={loading}/>
         <BudgetStatus data={remaingBudgetData} loading={loading}/>
       </div>
-      <RecentExpenses data={recentExpenseData} loading={loading}/>
+      <RecentExpenses data={expenseMonthRangeData} loading={loading}/>
     </div>
   )
 }

@@ -48,36 +48,46 @@ class CategorySchema(ModelSchema):
         fields = ['id', 'name']
 
 
-# ------- Receipts ----------
-
-class ReceiptItemSchema(Schema):
+# ------- Expense ----------
+class ExpenseMixSchema(Schema):
     id: int
-    name: str
+    merchant: str
+    total: float
+    date: date
     category: str
-    amount: float
-    confirmed: bool
+    receipt_id: Optional[int] = None
 
 
+class ExpenseSchema(ModelSchema):
+    category: str
+    receipt_id: Optional[int] = None
+
+    @staticmethod
+    def resolve_category(obj):
+        return obj.category.name
+
+    @staticmethod
+    def resolve_receipt_id(obj):
+        return obj.receipt_id
+
+    class Meta:
+        model = Expense
+        fields = ['id', 'merchant', 'date', 'total', 'note']
+
+
+# ------- Receipts ----------
 class ReceiptSchema(ModelSchema):
-    items: list['ReceiptItemSchema'] = []
+    expenses: list[ExpenseMixSchema] = []
 
     class Meta:
         model = Receipt
-        fields = ['id', 'merchant', 'date', 'total', 'created_at']
+        fields = ['id', 'created_at']
 
 
-class UpdateReceiptSchema(Schema):
-    merchant: Optional[str] = None
-    date: Optional[str] = None
-    total: Optional[float] = None
+class ScanResultSchema(Schema):
+    receipt_id: int
+    expenses: list[ExpenseMixSchema]
 
-
-class UpdateReceiptItemSchema(Schema):
-    username: Optional[str] = None
-    category: Optional[str] = None
-    amount: Optional[float] = None
-    name: Optional[str] = None
-    confirmed: Optional[bool] = None
 
 # ------- Budget ----------
 class GetBudgetSchema(ModelSchema):
@@ -103,29 +113,3 @@ class BudgetRemainingSchema(Schema):
 class UpdateBudgetSchema(Schema):
     limit: float
     period: str
-
-
-# ------- Expense ----------
-class ExpenseSchema(ModelSchema):
-    category: str
-
-    @staticmethod
-    def resolve_category(obj):
-        return obj.category.name
-
-    class Meta:
-        model = Expense
-        fields = ['id', 'merchant', 'date', 'total', 'note']
-
-class ExpenseMixSchema(Schema):
-    type: str
-    id: int
-    merchant: str
-    total: float
-    date: date
-    category: str
-
-# retired
-# class ExpenseRange(Schema):
-#     receipts: list[ReceiptSchema]
-#     expenses: list[ExpenseSchema]

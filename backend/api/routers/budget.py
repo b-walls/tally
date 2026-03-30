@@ -8,7 +8,7 @@ from api.auth import SessionAuth
 from django.contrib.auth.models import User
 from django.db.models import Sum
 
-from api.models import ReceiptItem, Budget, UserSettings, Category, Expense
+from api.models import Budget, Expense
 from api.schema import GetBudgetSchema, BudgetRemainingSchema, UpdateBudgetSchema, Message
 
 logger = logging.getLogger(__name__)
@@ -30,47 +30,29 @@ def get_remaining_budget(request, username: str | None = None):
 
     if user.is_superuser and username is not None:
         user = User.objects.get(username=username)
-    
+
     today = date.today()
-    budgets = Budget.objects.filter(user=user).select_related('category')
+    budgets = list(Budget.objects.filter(user=user).select_related('category'))
+
+    period_starts = {b.period: get_period_start(b.period) for b in budgets}
+    earliest_start = min(period_starts.values())
+
+    expense_totals = {
+        row['category_id']: row['total']
+        for row in Expense.objects.filter(
+            user=user,
+            date__range=(earliest_start, today),
+        ).values('category_id').annotate(total=Sum('total'))
+    }
+
     results = []
     for budget in budgets:
-        period_start = get_period_start(budget.period)
-        total = ReceiptItem.objects.filter(receipt__user=user,
-                                                   receipt__date__range=(period_start, today),
-                                                   category=budget.category).aggregate(Sum("amount", default=0))['amount__sum']
-        total += Expense.objects.filter(user=user,
-                                        date__range=(period_start, today),
-                                        category=budget.category).aggregate(Sum("total", default=0))['total__sum']
-        
+        spent = expense_totals.get(budget.category_id) or 0
         results.append(BudgetRemainingSchema(id=budget.id,
                                              category=budget.category.name,
                                              limit=float(budget.limit),
-                                             remaining=float(budget.limit - total),
+                                             remaining=float(budget.limit - spent),
                                              period=budget.period))
-        
-    # receipt_items = ReceiptItem.objects.filter(receipt__user=user,
-    #                                            receipt__date__month=today.month,
-    #                                            receipt__date__year=today.year).select_related('category')
-    # expenses = Expense.objects.filter(user=user,
-    #                                   date__month=today.month,
-    #                                   date__year=today.year).select_related('category')
-
-    # category_spending = defaultdict(int)
-    # for item in receipt_items:
-    #     category_spending[item.category.name] += item.amount
-    
-    # for item in expenses:
-    #     category_spending[item.category.name] += item.total
-
-    # results = []
-    # for budget in budgets:
-    #     curr_category = budget.category.name
-    #     remaining = budget.limit - category_spending[curr_category]
-    #     results.append(BudgetRemainingSchema(id=budget.id,
-    #                                          category=curr_category,
-    #                                          limit=float(budget.limit),
-    #                                          remaining=float(remaining)))
 
     return Status(200, results)
 
