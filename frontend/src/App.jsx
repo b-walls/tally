@@ -11,6 +11,7 @@ import DashboardPage from './pages/DashboardPage'
 import BudgetPage from './pages/BudgetPage'
 import ExpensesPage from './pages/ExpensesPage'
 import ReportsPage from './pages/ReportsPage'
+import LogPage from './pages/LogPage'
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
         <Route index element={<DashboardPage />} />
         <Route path="/budget" element={<BudgetPage />} />
         <Route path="/expenses" element={<ExpensesPage />} />
+        <Route path="/expenses/log" element={<LogPage />} />
         <Route path="/reports" element={<ReportsPage/>}/>
       </Route>
 

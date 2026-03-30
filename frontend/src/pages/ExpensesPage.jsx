@@ -1,31 +1,53 @@
-import { Link } from "react-router-dom"
+import { Link, createSearchParams } from "react-router-dom"
 import { Scan, Plus, SparkleIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { getCategories } from "../api/category";
 import { Search } from "lucide-react";
+import { getTodayRange, getWeekRange, getMonthRange, getLastMonthRange, getLast3MonthRange, getThisYearRange } from "../utils/date";
+import { getExpenseRange } from "../api/expense";
 
 const sortOptions = [
   {groupName: "By date", options: ["Newest first", "Oldest first"]},
-  {groupName: "By amount", options: ["Highest first", "Lowest first"]},
-  {groupName: "By category", options: ["Category (A-Z)", "Category (Z-A)"]}
+  {groupName: "By amount", options: ["Highest first", "Lowest first"]}
 ]
 
 const dateRangeOptions = [
-  "Today", "This week", "This month", "Last month", "Last 3 months", "This year", "All time"
+  "Today", "This week", "This month", "Last month", "Last 3 months", "This year"
 ]
+
+const rangeToDates = {
+  "Today": getTodayRange, 
+  "This week": getWeekRange, 
+  "This month": getMonthRange, 
+  "Last month": getLastMonthRange, 
+  "Last 3 months": getLast3MonthRange, 
+  "This year": getThisYearRange, 
+}
+
+const sortToString = {
+  "Newest first": "-date", 
+  "Oldest first": "date",
+  "Highest first": "-total",
+  "Lowest first": "total",
+
+}
+
 
 export default function ReceiptsPage() {
   const [categories, setCategories] = useState([]);
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState({range: "This month", categories: "All", sort: "Newest first", search: ""});
+  const [expenses, setExpenses] = useState();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchExpenses = async () => {
+      const [start, end] = rangeToDates[filters.range]();
+      const sortStr = sortToString[filters.sort];
+      
       try {
-        const data = await getCategories();
-        setCategories(data);
-
-        console.log(data);
+        setLoading(true);
+        const data = await getExpenseRange(start, end, sortStr);
+        setExpenses(data);
       } catch (error) {
         console.error(error);
       } finally {
@@ -33,7 +55,22 @@ export default function ReceiptsPage() {
       }
     }
 
-    filters.range = "This month";
+    fetchExpenses();
+  }, [filters]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data);
+
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     fetchData();
   }, [])
 
@@ -42,11 +79,11 @@ export default function ReceiptsPage() {
       <div className="flex flex-wrap justify-between items-center my-3">
         <div>
           <h1 className="text-2xl">Expenses</h1>
-          <p className="text-text-muted">24 transactions this month</p>
+          {loading ? <p className="text-text-muted">loading...</p> : <p className="text-text-muted">{expenses.length} transactions {filters.range.toLowerCase()}</p>}
         </div>
         <div className="md:flex gap-2 hidden ">
-          <Link to="expenses/scan" className="border border-border bg-surface-raised rounded-lg p-3 flex gap-2 items-center transition-all duration-300 hover:bg-surface-raised-2"> <Scan/> Scan receipt</Link>
-          <Link to="expenses/log" className="border border-border bg-primary text-background rounded-lg p-3 flex gap-2 items-center transition-all duration-300 hover:bg-primary/80"> <Plus/> Log expense</Link>
+          <Link to="/expenses/scan" className="border border-border bg-surface-raised rounded-lg p-3 flex gap-2 items-center transition-all duration-300 hover:bg-surface-raised-2"> <Scan/> Scan receipt</Link>
+          <Link to="/expenses/log" className="border border-border bg-primary text-background rounded-lg p-3 flex gap-2 items-center transition-all duration-300 hover:bg-primary/80"> <Plus/> Log expense</Link>
         </div>
       </div>
       <div className="flex flex-wrap flex-col md:flex-row gap-3">
@@ -84,6 +121,11 @@ export default function ReceiptsPage() {
             onClick={() => {setFilters((p) => ({...p, range: range}))}}>
             {range}
           </span>
+        ))}
+      </div>
+      <div>
+        {expenses.map((expense, index) => (
+          <div key={index} className="bg-surface-raised-2">{expense.merchant} - {expense.total}</div>
         ))}
       </div>
     </div>

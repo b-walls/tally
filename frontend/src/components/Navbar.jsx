@@ -1,17 +1,17 @@
 import { useLocation, Link } from 'react-router-dom';
 import { useAuth } from "../contexts/AuthContext"
-import { House, Landmark, Wallet, BarChart3, Settings } from 'lucide-react'
+import { House, Landmark, Wallet, BarChart3, Settings, LayoutDashboard } from 'lucide-react'
 
 import tally_icon_32 from "../assets/tally_icon_32.svg"
 
 function NavLinkCol({ to, text, selected, icon: Icon }) {
     return selected ? (
-        <Link to={to} className="text-primary bg-primary-muted rounded-lg flex flex-row gap-4 pl-3 pr-5 py-3 ml-1">
+        <Link to={to} className="text-primary bg-primary/30 rounded-lg flex flex-row gap-4 pl-3 pr-5 py-3 ml-1">
             <Icon/>
             {text}
         </Link>
     ) : (
-        <Link to={to} className="rounded-lg flex flex-row gap-4 pl-3 pr-5 py-3 ml-1">
+        <Link to={to} className="rounded-lg flex flex-row gap-4 pl-3 pr-5 py-3 ml-1 hover:bg-primary-muted hover:text-primary">
             <Icon/>
             {text}
         </Link>
@@ -48,8 +48,8 @@ function Navbar() {
                 </div>
                 <p className='text-[clamp(0.75rem,3vw,0.75rem)] text-text-muted uppercase mt-1 tracking-tight'>Budget & Expense Tracking</p>
 
-                <div className="flex flex-col mt-10">
-                    <NavLinkCol to="/dashboard" text="Dashboard" icon={House} selected={currSelected === '/'}/>
+                <div className="flex flex-col mt-10 gap-1">
+                    <NavLinkCol to="/dashboard" text="Dashboard" icon={LayoutDashboard} selected={currSelected === '/'}/>
                     <NavLinkCol to="/expenses" text="Expenses" icon={Landmark} selected={currSelected.startsWith("/expenses")}/>
                     <NavLinkCol to="/budget" text="Budget" icon={Wallet} selected={currSelected.startsWith("/budget")}/>
                     <NavLinkCol to="/reports" text="Reports" icon={BarChart3} selected={currSelected.startsWith("/reports")}/>
