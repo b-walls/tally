@@ -65,7 +65,7 @@ class Expense(models.Model):
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     date = models.DateField()
     total = models.DecimalField(max_digits=8, decimal_places=2)
-    note = models.TextField()
+    note = models.TextField(blank=True)
     
     def __str__(self):
         return f"{self.user.username} expense: {self.merchant} ${self.total}"

@@ -35,9 +35,9 @@ const sortToString = {
 
 export default function ReceiptsPage() {
   const [categories, setCategories] = useState([]);
-  const [filters, setFilters] = useState({range: "This month", categories: "All", sort: "Newest first", search: ""});
-  const [expenses, setExpenses] = useState();
-  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({range: "This month", category: "All", sort: "Newest first", search: ""});
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState({expenses: true, categories: true});
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -45,13 +45,23 @@ export default function ReceiptsPage() {
       const sortStr = sortToString[filters.sort];
       
       try {
-        setLoading(true);
-        const data = await getExpenseRange(start, end, sortStr);
+        setLoading((p) => ({...p, expenses: true}));
+        let data = await getExpenseRange(start, end, sortStr);
+
+        if (filters.category !== "All") {
+          data = data.filter((item) => {
+            if (item.category) {
+              return item.category === filters.category;
+            } else {
+              return "Receipt" === filters.category;
+            }
+          })
+        }
         setExpenses(data);
       } catch (error) {
         console.error(error);
       } finally {
-        setLoading(false);
+        setLoading((p) => ({...p, expenses: false}));
       }
     }
 
@@ -61,13 +71,14 @@ export default function ReceiptsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getCategories();
+        let data = await getCategories();
+        data = [{id: null, name: "Receipt"}, ...data]
         setCategories(data);
 
       } catch (error) {
         console.error(error);
       } finally {
-        setLoading(false);
+        setLoading((p) => ({...p, categories: false}));
       }
     }
 
@@ -79,7 +90,7 @@ export default function ReceiptsPage() {
       <div className="flex flex-wrap justify-between items-center my-3">
         <div>
           <h1 className="text-2xl">Expenses</h1>
-          {loading ? <p className="text-text-muted">loading...</p> : <p className="text-text-muted">{expenses.length} transactions {filters.range.toLowerCase()}</p>}
+          {loading.expenses ? <p className="text-text-muted">loading...</p> : <p className="text-text-muted">{expenses.length} transactions {filters.range.toLowerCase()}</p>}
         </div>
         <div className="md:flex gap-2 hidden ">
           <Link to="/expenses/scan" className="border border-border bg-surface-raised rounded-lg p-3 flex gap-2 items-center transition-all duration-300 hover:bg-surface-raised-2"> <Scan/> Scan receipt</Link>
@@ -124,9 +135,13 @@ export default function ReceiptsPage() {
         ))}
       </div>
       <div>
-        {expenses.map((expense, index) => (
-          <div key={index} className="bg-surface-raised-2">{expense.merchant} - {expense.total}</div>
-        ))}
+        {loading.expenses ? (
+          <p>loading...</p>
+        ) : (
+          expenses.map((expense, index) => (
+            <div key={index} className="bg-surface-raised-2">{expense.merchant} - {expense.total}</div>
+          ))
+        )}
       </div>
     </div>
   )
