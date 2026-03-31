@@ -9,26 +9,34 @@
   /* --font-heading is applied to h1–h6 below */
   --font-heading: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 
-  --color-background: #111111;
-  --color-surface: #1c1c1c;
-  --color-surface-raised: #2a2a2a;
-  --color-surface-raised-2: #333333;
-  --color-border: #3d3d3d;
+  --color-background: #0a0f1e;
+  --color-surface: #111827;
+  --color-surface-raised: #1a2235;
+  --color-surface-raised-2: #243047;
+  --color-border: #2d3f5e;
 
-  --color-primary: #a78bfa;
-  --color-primary-hover: #8b5cf6;
-  --color-primary-muted: #a78bfa1a;
+  --color-primary: #00d4aa;
+  --color-primary-hover: #00b893;
+  --color-primary-muted: #00d4aa13;
 
-  --color-text: #f5f5f5;
-  --color-text-muted: #a0a0a0;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #2563eb;
+  --color-accent-muted: #3b82f613;
 
-  --color-success: #4ade80;
+  --color-accent-2: #38bdf8;
+  --color-accent-2-hover: #0ea5e9;
+  --color-accent-2-muted: #38bdf813;
+
+  --color-text: #f0f4ff;
+  --color-text-muted: #8896b3;
+
+  --color-success: #00d4aa;
   --color-warning: #fbbf24;
   --color-danger: #f87171;
 }
 
 :root {
-  background-color: #111111;
+  background-color: #0a0f1e;
 }
 
 

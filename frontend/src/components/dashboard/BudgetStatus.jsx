@@ -5,18 +5,15 @@ const COLORS = {primary: "#a78bfa", textDanger: "#f87171", text: "#f5f5f5", succ
 function Bar({item}) {
   const spent = item.limit - item.remaining;
   const width = Math.max(3, Math.min(100, ((spent) / item.limit * 100)))
-  const barColor = item.remaining <= 0 ? "red" : COLORS.primary;
-  const textColor = item.remaining <= 0 ? COLORS.textDanger : COLORS.textMuted;
-
   return (
     <>
       <div className='flex justify-between mb-1'>
         <p>{item.category}</p>
-        <p style={{color: textColor}}>${spent.toFixed(2)} / ${item.limit.toFixed(2)}</p>
+        <p className={`${item.remaining <= 0 ? "text-danger" : "text-text-muted"}`}>${spent.toFixed(2)} / ${item.limit.toFixed(2)}</p>
       </div>
-      <div className='flex-1 width-full bg-surface-raised-2 rounded-3xl'>
-        <div className='h-2 rounded-3xl' style={{width: width + "%", backgroundColor: barColor}}>
-
+      <div className="flex-1 width-full bg-surface-raised-2 rounded-3xl">
+        <div className={`h-2 rounded-3xl ${item.remaining <= 0 ? "bg-red-500" : "bg-primary"}`}
+             style={{ width: `${width}%` }}>
         </div>
       </div>
     </>

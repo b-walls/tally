@@ -1,80 +1,44 @@
 import React, {useEffect, useMemo, useState} from 'react'
 
-function getDataInsights(data) {
-  console.log(data);
-  const largest = {category: "", spent: -Infinity}
-  let withinBudget = 0;
-  let numBudgetedCategories = 0;
-
-  data.budget.forEach((item) => {
-    // largest tracking
-    const currNum = parseFloat(item.limit) - parseFloat(item.remaining);
-    if (currNum > largest.spent) {
-      largest.category = item.category;
-      largest.spent = currNum;
-    }
-
-    if (item.limit > 0) {
-      withinBudget += item.remaining < 0 ? 0 : 1;
-      numBudgetedCategories += 1;
-    }
-  })
-  
-  const totalSpending = data.expenses.data.reduce((accum, curr) => {
-    accum += curr.total;
-    return accum;
-  }, 0)
-
-  return {largest: largest, withinBudget: withinBudget, numBudgeted: numBudgetedCategories, monthlySpending: totalSpending}
-}
-
 const now = new Date();
 const firstDayNextMonth = new Date(now.getFullYear(), (now.getMonth() + 1 % 12), 1)
 const tilNextMonth = Math.floor((firstDayNextMonth - now) / 1000 / 60 / 60 / 24)
 
 function BudgetOverview({ data, loading }) {
-  const [dataInsights, setDataInsights] = useState({largest: {category: "", spent: -Infinity}, withinBudget: 0, numBudgeted: 0, monthlySpending: 0});
-
-  useEffect(() => {
-
-  }, [])
-
-  useMemo(() => {
-    if (loading) return [];
-    const dataInsights = getDataInsights(data);
-    setDataInsights(dataInsights);
-  }, [data, loading]);
-    
-    
-
   return (
     <>
     {loading ? <div>loading</div> : 
     <>
-    <div className='gap-3 my-3 hidden md:flex'>
-      <div className={`flex flex-col flex-1 border-t-2 border border-border bg-surface-raised rounded-lg p-5 shadow-sm ${dataInsights.withinBudget > (0.5 * dataInsights.numBudgeted) ? "border-t-danger" : "border-t-success"}`}>
-        
+    <div className='gap-3 my-3 md:flex flex-wrap mb-6 md:mb-3'>
+      <div className="flex-col border-t-primary border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm hidden md:flex justify-evenly">
+        <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Budget health</h2></div>
+        <h1 className='text-5xl py-1 text-primary'>Good</h1>
+        <p className='text-text-muted'>3 on track · 1 over</p>
+        <div className='flex flex-1 min-h-2 max-h-2 bg-surface-raised-2 my-2 rounded-md overflow-clip'>
+          <div className='bg-primary rounded-md' style={{width: "72%"}}></div>
+        </div>
+        <div className='flex justify-between flex-wrap'><p className='text-text-muted'>72% of budgets healthy</p></div>
       </div>
-      <div className='flex flex-col flex-1 justify-evenly border-t-2 border-t-blue-400 border border-border bg-surface-raised rounded-lg p-5 shadow-sm'>
-        <p className='mb-1 text-text-muted'>Largest category</p>
-        <h1 className="text-[clamp(2rem,3vw,5rem)]">{dataInsights.largest.category}</h1>
-        <p className='text-text-muted'>${(dataInsights.largest.spent).toFixed(2)} spent</p>
+      <div className="flex flex-col border-t-accent-2 border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm justify-evenly">
+        <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Weekly Budgets</h2><span className='bg-accent-2-muted rounded-lg text-accent-2 px-2 max-h-6'>wkly</span></div>
+        <h1 className='text-5xl py-1'>$77.37</h1>
+        <p className='text-text-muted'>of $120 this week</p>
+        <div className='flex flex-1 min-h-2 max-h-2 bg-surface-raised-2 my-2 rounded-md overflow-clip'>
+          <div className='bg-accent-2 rounded-md' style={{width: "40%"}}></div>
+        </div>
+        <div className='flex justify-between flex-wrap'><p className='text-text-muted'>2 categories</p><p className='text-accent-2'>$42.63 left</p></div>
+      </div>
+      <div className="flex flex-col border-t-accent border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm justify-evenly mt-2 md:mt-0">
+        <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Monthly Budgets</h2><span className='bg-accent-muted rounded-lg text-accent px-2 max-h-6'>mo</span></div>
+        <h1 className='text-5xl py-1'>$12.99</h1>
+        <p className='text-text-muted'>of $160 this month</p>
+        <div className='flex flex-1 min-h-2 max-h-2 bg-surface-raised-2 my-2 rounded-md overflow-clip'>
+          <div className='bg-accent rounded-md' style={{width: "10%"}}></div>
+        </div>
+        <div className='flex justify-between flex-wrap'><p className='text-text-muted'>2 categories</p><p className='text-accent'>$42.63 left</p></div>
       </div>
     </div>
-    {/* <div className='py-5 md:py-0'>
-        <div className='flex flex-col md:hidden bg-surface-raised rounded-2xl p-5 border border-border shadow-md'>
-          <h2 className='text-primary uppercase'>Remaining this month</h2>
-          {totalRemaining > 0 ? <h1 className='text-[clamp(2rem,3vw,5rem)] text-success'>${totalRemaining.toFixed(2)}</h1> : <h1 className='text-[clamp(2rem,3vw,5rem)] text-danger'>-${(totalRemaining * -1).toFixed(2)}</h1>}
-          <p className='text-text-muted mb-3'>of ${totalBudget.toFixed(2)} budget</p>
-          <div className='bg-surface-raised-2 rounded-md mb-2'>
-            <div className='bg-primary h-3 rounded-md' style={{width: totalBudget > 0 ? Math.min(100, (totalSpent / totalBudget) * 100) + "%" : "100%"}}/>
-          </div>
-          <div className='flex justify-between'>
-            <p className='text-text-muted'>${totalSpent.toFixed(2)} spent</p>
-            {totalRemaining > 0 ? <p className='text-text-muted'>~ ${(totalRemaining/tilNextMonth).toFixed(2)}/day left</p> : <p className='text-text-muted'>$0/day left</p>}
-          </div>
-        </div>
-    </div> */}
+
     </>
     } 
     </>

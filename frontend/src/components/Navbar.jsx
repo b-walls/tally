@@ -6,14 +6,14 @@ import tally_icon_32 from "../assets/tally_icon_32.svg"
 
 function NavLinkCol({ to, text, selected, icon: Icon }) {
     return selected ? (
-        <Link to={to} className="text-primary bg-primary/30 rounded-lg flex flex-row gap-4 pl-3 pr-5 py-3 ml-1">
+        <Link to={to} className="text-primary bg-primary/30 rounded-lg flex flex-row gap-4 pl-3 py-3">
             <Icon/>
-            {text}
+            <div className='hidden lg:block'>{text}</div>
         </Link>
     ) : (
-        <Link to={to} className="rounded-lg flex flex-row gap-4 pl-3 pr-5 py-3 ml-1 hover:bg-primary-muted hover:text-primary">
+        <Link to={to} className="rounded-lg flex flex-row gap-4 pl-3 py-3 hover:bg-primary-muted hover:text-primary">
             <Icon/>
-            {text}
+            <div className='hidden lg:block'>{text}</div>
         </Link>
     )
 }
@@ -38,7 +38,7 @@ function Navbar() {
 
     return (
         <>
-        <div className="flex-col bg-background px-4 pt-10 pb-5 border-r border-border h-screen hidden md:flex justify-between">
+        <div className="flex-col bg-background px-4 pt-10 pb-5 border-r border-border h-screen hidden md:flex max-w-20 lg:max-w-100 justify-between">
             <div>
                 <div className='flex flex-row items-center'>
                     {/* <img src={tally_icon_32} alt="Tally logo" /> */}
@@ -46,7 +46,7 @@ function Navbar() {
                         Tally
                     </h1>
                 </div>
-                <p className='text-[clamp(0.75rem,3vw,0.75rem)] text-text-muted uppercase mt-1 tracking-tight'>Budget & Expense Tracking</p>
+                <p className='text-[clamp(0.75rem,3vw,0.75rem)] text-text-muted uppercase mt-1 tracking-tight hidden lg:block'>Budget & Expense Tracking</p>
 
                 <div className="flex flex-col mt-10 gap-1">
                     <NavLinkCol to="/dashboard" text="Dashboard" icon={LayoutDashboard} selected={currSelected === '/'}/>
@@ -58,11 +58,11 @@ function Navbar() {
 
             <div>
                 <hr className='text-border'/>
-                <Link to="/settings" className='px-4 pt-5 flex flex-row gap-4'>
+                <Link to="/settings" className='lg:px-4 pt-5 flex flex-row gap-4'>
                     <div className='rounded-full bg-surface-raised w-[40px] h-[40px] p-2 flex justify-center items-center'>
                         {user.first_name[0]}{user.last_name[0]}
                     </div>
-                    <div>
+                    <div className='hidden lg:block'>
                         <h2>{user.first_name} {user.last_name[0]}.</h2>
                         <div className="flex flex-row items-center gap-1">
                             <Settings size={16} className='text-text-muted'/> <p className='text-text-muted'>Settings</p>

@@ -1,10 +1,12 @@
 import client from './client'
+import { toLocalDateString } from '../utils/date';
 
 export const getExpenseRange = async (startDate, endDate, sort = undefined) => {
+    console.log(startDate, endDate);
     const { data } = await client.get('/expense/range', {
         params: {
-            start: startDate.toISOString().slice(0, 10),
-            end: endDate.toISOString().slice(0, 10),
+            start: toLocalDateString(startDate),
+            end: toLocalDateString(endDate),
             sort: sort
         }
     });

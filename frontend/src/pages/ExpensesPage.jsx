@@ -57,6 +57,7 @@ export default function ReceiptsPage() {
             }
           })
         }
+
         setExpenses(data);
       } catch (error) {
         console.error(error);

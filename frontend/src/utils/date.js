@@ -4,6 +4,13 @@ export function sameDay(d1, d2) {
          d1.getDate() === d2.getDate();
 }
 
+export function toLocalDateString(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 export function getTodayRange() {
   const now = new Date();
   return [now, now]
@@ -18,6 +25,7 @@ export function getWeekRange() {
   const endOfWeek = new Date(startOfWeek);
   endOfWeek.setDate(endOfWeek.getDate() + 6);
 
+  console.log(startOfWeek, endOfWeek);
   return [startOfWeek, endOfWeek]
 }
 

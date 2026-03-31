@@ -66,21 +66,19 @@ function Bar( {item, max, index, dayOfWeek} ) {
   const inFuture = index > dayOfWeek;
 
   let height = "100%";
-  let color = "";
   let border = "1px dashed " + COLORS.border;
   let shadow = "";
 
   if (!inFuture) {
     height = ((item.total / max) * 100) == 0 ? "5%" : ((item.total / max) * 100) + "%";
-    color = index == dayOfWeek ? COLORS.primary : COLORS.surfaceRaised2;
     border = "1px solid " + COLORS.border;
     shadow = '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)';
   }
 
   return (
     <div
-      className='rounded-xs'
-      style={{height: height, backgroundColor: color, border: border, boxShadow: shadow}}>
+      className={`rounded-xs ${index == dayOfWeek ? "bg-primary" : index > dayOfWeek ? "bg-none" : "bg-surface-raised-2"}`}
+      style={{height: height, border: border, boxShadow: shadow}}>
     </div>
   )
 }
@@ -116,11 +114,7 @@ function BarChart( {data, loading} ) {
               <Bar item={item} max={max} index={index} dayOfWeek={dayOfWeek} />
           </div>
           {/* colors the bar label */}
-          {index == dayOfWeek ?
-            <p className='text-primary'>{DAY_LETTERS[index]}</p>
-            :
-            <p className='text-text-muted'>{DAY_LETTERS[index]}</p>
-          }
+          <p className={`${index == dayOfWeek ? "text-primary" : "text-text-muted"}`}>{DAY_LETTERS[index]}</p>
         </div>
       ))}
       </div>
