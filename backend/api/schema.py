@@ -107,6 +107,7 @@ class BudgetRemainingSchema(Schema):
     category: str
     limit: float
     remaining: float
+    spent: float
     period: str
 
 

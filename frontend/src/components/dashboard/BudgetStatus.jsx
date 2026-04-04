@@ -3,7 +3,7 @@ import React, { useMemo } from 'react'
 const COLORS = {primary: "#a78bfa", textDanger: "#f87171", text: "#f5f5f5", success: "#4ade80", textMuted: "#888888"}
 
 function Bar({item}) {
-  const spent = item.limit - item.remaining;
+  const spent = item.spent;
   const width = Math.max(3, Math.min(100, ((spent) / item.limit * 100)))
   return (
     <>

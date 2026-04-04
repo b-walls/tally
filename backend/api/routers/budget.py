@@ -51,6 +51,7 @@ def get_remaining_budget(request, username: str | None = None):
         results.append(BudgetRemainingSchema(id=budget.id,
                                              category=budget.category.name,
                                              limit=float(budget.limit),
+                                             spent=spent,
                                              remaining=float(budget.limit - spent),
                                              period=budget.period))
 

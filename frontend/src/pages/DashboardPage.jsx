@@ -81,7 +81,7 @@ function DashboardPage() {
           <Link to="expenses/log" className="border border-border bg-primary text-background rounded-lg p-3 flex gap-2 transition-all duration-300 hover:bg-primary/80"> <Plus/> Log expense</Link>
         </div>
       </div>
-      <BudgetOverview data={{budget: remaingBudgetData, expenses: expenseMonthRangeData}} loading={loading}/>
+      <BudgetOverview data={remaingBudgetData} loading={loading}/>
       <div className="gap-3 flex pb-5 md:hidden md:pb-0">
         <Link to="expenses/scan" className="border border-border bg-surface-raised rounded-lg p-3 flex gap-2 flex-1 items-center"> <Scan/> Scan receipt</Link>
         <Link to="expenses/log" className="border border-border bg-primary text-background rounded-lg p-3 bg-linear-to-tl from-primary to-primary-hover  flex gap-2 flex-1 items-center">
