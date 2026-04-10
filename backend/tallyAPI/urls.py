@@ -1,8 +1,11 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from ninja_extra import NinjaExtraAPI
+
+from allauth.headless.contrib.ninja.security import x_session_token_auth
+from ninja.security import django_auth
 
 from api.routers.receipts import receipt_router
 from api.routers.auth import auth_router
@@ -14,6 +17,7 @@ api = NinjaExtraAPI(
     title='Tally API',
     version='1.0.0',
     description='Receipt scanning and budget tracking',
+    auth=[django_auth, x_session_token_auth],
 )
 
 api.add_router('/receipts', receipt_router)
@@ -25,4 +29,5 @@ api.add_router('/expense', expense_router)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', api.urls),
+    path("_allauth/", include("allauth.headless.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

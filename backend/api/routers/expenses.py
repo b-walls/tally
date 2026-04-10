@@ -9,7 +9,7 @@ from api.schema import Message, ExpenseMixSchema
 
 logger = logging.getLogger(__name__)
 
-expense_router = Router(auth=SessionAuth())
+expense_router = Router()
 
 VALID_SORTS = {"date", "-date", "total", "-total"}
 

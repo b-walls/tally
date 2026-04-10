@@ -1,6 +1,6 @@
 import client from "./client";
 
 export const getCategories = async () => {
-    const { data } = await client.get('/category/');
+    const { data } = await client.get('/api/category/');
     return data
 }

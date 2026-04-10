@@ -13,7 +13,7 @@ from api.schema import GetBudgetSchema, BudgetRemainingSchema, UpdateBudgetSchem
 
 logger = logging.getLogger(__name__)
 
-budget_router = Router(auth=SessionAuth())
+budget_router = Router()
 
 def get_period_start(period):
     today = date.today()

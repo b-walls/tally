@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 client = AsyncOpenAI()
 
-receipt_router = Router(auth=SessionAuth())
+receipt_router = Router()
 
 
 async def scan_request(categories: list[str], base64_img: str) -> ScanResponse:

@@ -12,5 +12,6 @@ pytest>=8.0
 httpx>=0.27
 flake8>=7.0
 pydantic[email]
+django-allauth[mfa,socialaccount,headless]>=65.15.1
 boto3
 django-storages

@@ -17,7 +17,9 @@ export function AuthProvider({ children }) {
   // On mount, verify the httpOnly cookie is still valid by calling /me.
   useEffect(() => {
     getMe()
-      .then(setUser)
+      .then((data) => {
+        setUser(data.data.user)
+      })
       .catch(() => setUser(false))
       .finally(() => setLoading(false))
   }, [])

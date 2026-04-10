@@ -41,35 +41,64 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+
+    'allauth',
+    'allauth.account',
+    'allauth.headless',
+    # 'allauth.socialaccount', 
+
     'ninja_extra',
     'api',
+
     'storages',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",  # must be first
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+# ── Allauth ───────────────────────────────────────────────
+HEADLESS_ONLY = True
+
+HEADLESS_ADAPTER = "api.adapters.CustomHeadlessAdapter"
+
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+
+ACCOUNT_EMAIL_VERIFICATION = "none"  # "mandatory" in production
+
+HEADLESS_FRONTEND_URLS = {
+    "account_confirm_email": "http://localhost:5173/verify-email/{key}",
+    "account_reset_password": "http://localhost:5173/reset-password",
+    "account_reset_password_from_key": "http://localhost:5173/reset-password/{key}",
+}
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
-    'https://tally-app.vercel.app',
 ]
-
 CORS_ALLOW_CREDENTIALS = True  # Required to send cookies cross-origin
 
+
+# CSRF
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5173',
-    'https://tally-app.vercel.app',
 ]
 
-ROOT_URLCONF = 'tallyAPI.urls'
+CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SECURE = False   # True in production (HTTPS only)
+CSRF_COOKIE_HTTPONLY = False # Must be False — JS needs to read it
 
 TEMPLATES = [
     {
@@ -85,6 +114,8 @@ TEMPLATES = [
         },
     },
 ]
+
+ROOT_URLCONF = 'tallyAPI.urls'
 
 WSGI_APPLICATION = 'tallyAPI.wsgi.application'
 
@@ -170,8 +201,3 @@ STORAGES = {
 }
 
 MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
-
-# Session cookie security
-SESSION_COOKIE_HTTPONLY = True    # default, but explicit for clarity
-SESSION_COOKIE_SAMESITE = "Lax"  # default, protects against CSRF
-SESSION_COOKIE_SECURE = not DEBUG  # True in production (requires HTTPS)

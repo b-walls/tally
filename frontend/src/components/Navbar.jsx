@@ -59,7 +59,7 @@ function Navbar() {
             <div>
                 <hr className='text-border'/>
                 <Link to="/settings" className='lg:px-4 pt-5 flex flex-row gap-4'>
-                    <div className='rounded-full bg-surface-raised w-[40px] h-[40px] p-2 flex justify-center items-center'>
+                    <div className='rounded-full bg-surface-raised w-10 h-10 p-2 flex justify-center items-center'>
                         {user.first_name[0]}{user.last_name[0]}
                     </div>
                     <div className='hidden lg:block'>
