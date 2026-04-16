@@ -26,3 +26,13 @@ def get_expenses_within_range(request, start: date, end: date, sort: str = "date
                          date=e.date, category=e.category.name, receipt_id=e.receipt_id)
         for e in expenses
     ])
+
+@expense_router.get("/recent", response={200: list[ExpenseMixSchema], 422: Message})
+def get_recent_expenses(request):
+    user = request.user
+    expenses = Expense.objects.filter(user=user).order_by("-date")[:10]
+    return Status(200, [
+        ExpenseMixSchema(id=e.id, merchant=e.merchant, total=float(e.total),
+                         date=e.date, category=e.category.name, receipt_id=e.receipt_id)
+        for e in expenses
+    ])

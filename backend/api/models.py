@@ -56,7 +56,7 @@ class ExpenseItem(models.Model):
 
 class Expense(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE, null=True)
+    receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE, null=True, blank=True, default=None)
     merchant = models.CharField(max_length=50, blank=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     date = models.DateField()

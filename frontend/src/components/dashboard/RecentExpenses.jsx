@@ -4,8 +4,9 @@ import { ArrowRight } from 'lucide-react'
 import { sameDay } from '../../utils/date'
 
 function extractRecent(data) {
-	const maxIndex = Math.min(data.data.length, 5)
-	return data.data.reverse().slice(0, maxIndex);
+	console.log(data);
+	const maxIndex = Math.min(data.length, 5)
+	return data;
 }
 
 function getDayString(item) {
@@ -27,11 +28,14 @@ function getDayString(item) {
 
 function RecentExpenses({data, loading}) {
 
-	const items = useMemo(() => {
-    if (loading) return [];
-	return extractRecent(data);
-	}, [data, loading]);
-    
+	// const items = useMemo(() => {
+    // if (loading) return [];
+	// return extractRecent(data);
+	// }, [data, loading]);
+	if (loading) {
+		return <div>loading...</div>
+	}
+
   return (
     <div className='bg-surface-raised p-4 border border-border rounded-md flex flex-col'>
 			<div className='flex justify-between items-center mb-5'>
@@ -41,7 +45,7 @@ function RecentExpenses({data, loading}) {
 				</div>
 			</div>
 			<div className='flex-1 min-h-0 overflow-y-auto max-h-55'>
-      {items.map((item, index) => (
+      {data.map((item, index) => (
 				<div key={index}>
 					<div className={`flex justify-between bg-surface-raised-2 items-center py-2 px-3 rounded-md ${index == 0 ? null : "mt-2"}`}>
 						<div>

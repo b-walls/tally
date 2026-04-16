@@ -2,7 +2,6 @@ import client from './client'
 import { toLocalDateString } from '../utils/date';
 
 export const getExpenseRange = async (startDate, endDate, sort = undefined) => {
-    console.log(startDate, endDate);
     const { data } = await client.get('/api/expense/range', {
         params: {
             start: toLocalDateString(startDate),
@@ -13,12 +12,7 @@ export const getExpenseRange = async (startDate, endDate, sort = undefined) => {
     return data
 }
 
-export const getExpenseRecent = async (max = 30, sort = undefined) => {
-    const { data } = await client.get('/api/expense/recent', {
-        params: {
-            max: max,
-            sort: sort
-        }
-    });
+export const getExpenseRecent = async () => {
+    const { data } = await client.get('/api/expense/recent');
     return data
 }

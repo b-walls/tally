@@ -5,13 +5,13 @@ import { useAuth } from "../contexts/AuthContext"
 import { Scan, Plus } from 'lucide-react'
 
 import BudgetOverview from "../components/dashboard/BudgetOverview";
-import BarChart from "../components/dashboard/BarChart"
 import BudgetStatus from "../components/dashboard/BudgetStatus";
 import RecentExpenses from "../components/dashboard/RecentExpenses";
 
 import { getExpenseRange, getExpenseRecent } from "../api/expense";
 import { getRemaining } from "../api/budget"; 
 import { getWeekRange, getMonthRange } from "../utils/date";
+import DashboardChart from "@/components/dashboard/DashboardChart";
 
 const [startOfWeek, endOfWeek] = getWeekRange();
 const [startOfMonth, endOfMonth] = getMonthRange();
@@ -41,21 +41,24 @@ function DashboardPage() {
   const [remaingBudgetData, setRemaingBudgetData] = useState([]);
   const [expenseWeekRangeData, setExpenseWeekRangeData] = useState();
   const [expenseMonthRangeData, setExpenseMonthRangeData] = useState();
+  const [expenseRecentData, setExpenseRecentData] = useState();
 
   const { user } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [remaining, expensesWeekRange, expensesMonthRange] = await Promise.all([
+        const [remaining, expensesWeekRange, expensesMonthRange, expensesRecent] = await Promise.all([
           getRemaining(),
           getExpenseRange(startOfWeek, endOfWeek),
           getExpenseRange(startOfMonth, endOfMonth),
+          getExpenseRecent()
         ]);
 
         setRemaingBudgetData(remaining);
         setExpenseWeekRangeData({startDate: startOfWeek, endDate: endOfWeek, data: expensesWeekRange});
         setExpenseMonthRangeData({startDate: startOfMonth, endDate: endOfMonth, data: expensesMonthRange});
+        setExpenseRecentData(expensesRecent);
       } catch (error) {
         console.error(error);
       } finally {
@@ -89,10 +92,10 @@ function DashboardPage() {
         </Link>
       </div>
       <div className="flex flex-col md:flex-row gap-3 mb-3">
-        <BarChart data={expenseWeekRangeData} loading={loading}/>
+        <DashboardChart weekData={expenseWeekRangeData} monthData={expenseMonthRangeData} loading={loading}/>
         <BudgetStatus data={remaingBudgetData} loading={loading}/>
       </div>
-      <RecentExpenses data={expenseMonthRangeData} loading={loading}/>
+      <RecentExpenses data={expenseRecentData} loading={loading}/>
     </div>
   )
 }
