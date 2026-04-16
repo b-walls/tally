@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts"
 import { sameDay } from "@/utils/date"
+import { Skeleton } from "../ui/skeleton"
 
 import {
   ChartContainer,
@@ -88,12 +89,61 @@ export function DashboardChart( {weekData, monthData, loading} ) {
     if (!weekData || !monthData) {
       return null;
     }
-    console.log("MADDE ITT!!")
     return transform(weekData, monthData);
   }, [weekData, monthData])
 
   if (loading) {
-    return <h1>loading...</h1>
+    return (
+      <div className='flex flex-col flex-1 border bg-surface-raised border-border p-4 rounded-lg justify-between'>
+        <div className="flex justify-between">
+          <div>
+            <h1 className='text-2xl'>Daily spending</h1>
+            <Skeleton className='w-[100%] h-4 mt-3'/>
+          </div>
+      
+          <div
+            className="w-25 h-10 rounded-[9999px] bg-surface border border-border p-0.75 flex cursor-pointer hover:bg-surface-raised"
+            onClick={handleSwitchType}
+          >
+            <div className={`relative w-full flex transition-all duration-300`}>
+              <div className={`h-full w-[50%] rounded-[9999px] flex justify-center items-center transition-transform duration-300 border border-border ${
+                view === 'month' ? 'translate-x-full bg-accent-muted text-accent' : 'translate-x-0 bg-accent-2-muted text-accent-2'
+              }`}>
+                {view === 'week' ? 'wk' : 'mo'}
+              </div>
+            </div>
+          </div>
+        </div>
+        <ChartContainer config={chartConfig}>
+          <BarChart
+            accessibilityLayer
+            data={[]}
+            margin={{
+              top: 20,
+            }}
+          >
+            {/* <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="day"
+              tickLine={false}
+              tickMargin={10}
+              tick={{ fill: "var(--color-text-muted)"}}
+              axisLine={false}
+              tickFormatter={(value) => value.slice(0, 3)}
+            />
+            <Bar dataKey="total" fill="var(--color-primary)" radius={8}>
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-text-muted"
+                fontSize={12}
+                formatter={(value) => value ? `$${value.toFixed(2)}` : ""}
+              />
+            </Bar> */}
+          </BarChart>
+        </ChartContainer>
+      </div>
+    )
   }
 
   return (

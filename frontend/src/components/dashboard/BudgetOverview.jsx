@@ -1,4 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react'
+import { Skeleton } from "@/components/ui/skeleton"
 
 const now = new Date();
 const firstDayNextMonth = new Date(now.getFullYear(), (now.getMonth() + 1 % 12), 1)
@@ -26,17 +27,52 @@ function BudgetOverview({ data, loading }) {
 
   const [weeklyBudget, setWeeklyBudget] = useState([]);
   const [monthlyBudget, setMonthlyBudget] = useState([]);
+  const [budgetHealth, setBudgetHealth] = useState([]);
 
   useMemo(() => {
     setWeeklyBudget(getBudgetData(data, "weekly"));
     setMonthlyBudget(getBudgetData(data, "monthly"));
+    setBudgetHealth(getBudgetHealth(data));
     setLocalLoading(false);
   }, [data])
 
+  if (loading || localLoading) {
+    return (
+      <div className='gap-3 my-3 md:flex flex-wrap mb-6 md:mb-3'>
+      <div className="flex-col border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm hidden md:flex justify-evenly">
+        <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Budget health</h2></div>
+        <Skeleton className='h-12 my-1 w-[50%] rounded-xl'/>
+        <Skeleton className='h-6 w-[50%] rounded-xl'/>
+        <Skeleton className='flex flex-1 min-h-2 max-h-2 my-2 rounded-md overflow-clip'/>
+        <Skeleton className='h-6 w-[50%] rounded-xl'/>
+      </div>
+
+      <div className="flex flex-col border-t-accent-2 border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm justify-evenly">
+        <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Weekly Budgets</h2><span className='bg-accent-2-muted rounded-lg text-accent-2 px-2 max-h-6'>wkly</span></div>
+        <Skeleton className='h-12 my-1 w-[50%] rounded-xl'/>
+        <Skeleton className='h-6 w-[50%] rounded-xl'/>
+        <Skeleton className='flex flex-1 min-h-2 max-h-2 my-2 rounded-md overflow-clip'/>
+        <div className='flex justify-between'>
+          <Skeleton className='h-6 w-[30%] rounded-xl'/>
+          <Skeleton className='h-6 w-[30%] rounded-xl'/>
+        </div>
+      </div>
+
+      <div className="flex flex-col border-t-accent border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm justify-evenly mt-2 md:mt-0">
+        <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Monthly Budgets</h2><span className='bg-accent-muted rounded-lg text-accent px-2 max-h-6'>mo</span></div>
+        <Skeleton className='h-12 my-1 w-[50%] rounded-xl'/>
+        <Skeleton className='h-6 w-[50%] rounded-xl'/>
+        <Skeleton className='flex flex-1 min-h-2 max-h-2 my-2 rounded-md overflow-clip'/>
+        <div className='flex justify-between'>
+          <Skeleton className='h-6 w-[30%] rounded-xl'/>
+          <Skeleton className='h-6 w-[30%] rounded-xl'/>
+        </div>
+      </div>
+    </div>
+    );
+  }
+
   return (
-    <>
-    {loading || localLoading ? <div>loading</div> : 
-    <>
     <div className='gap-3 my-3 md:flex flex-wrap mb-6 md:mb-3'>
       <div className="flex-col border-t-primary border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm hidden md:flex justify-evenly">
         <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Budget health</h2></div>
@@ -68,10 +104,6 @@ function BudgetOverview({ data, loading }) {
         <div className='flex justify-between flex-wrap'><p className='text-text-muted'>{monthlyBudget.size} categories</p><p className='text-accent'>${monthlyBudget.left} left</p></div>
       </div>
     </div>
-
-    </>
-    } 
-    </>
   )
 }
 

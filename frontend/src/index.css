@@ -33,6 +33,9 @@
   --color-success: #00d4aa;
   --color-warning: #fbbf24;
   --color-danger: #f87171;
+
+  --color-muted: #243047;
+  --color-muted-foreground: #8896b3;
 }
 
 :root {
