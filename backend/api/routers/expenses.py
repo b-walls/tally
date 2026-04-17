@@ -20,19 +20,19 @@ def get_expenses_within_range(request, start: date, end: date, sort: str = "date
         return Status(422, {"message": "Unsupported sort parameter"})
 
     user = request.user
-    expenses = Expense.objects.filter(user=user, date__range=(start, end)).order_by(sort).select_related('category')
+    expenses = Expense.objects.filter(user=user, date__range=(start, end)).select_related('category').order_by(sort)
     return Status(200, [
         ExpenseMixSchema(id=e.id, merchant=e.merchant, total=float(e.total),
-                         date=e.date, category=e.category.name, receipt_id=e.receipt_id)
+                         date=e.date, category=e.category, receipt_id=e.receipt_id)
         for e in expenses
     ])
 
 @expense_router.get("/recent", response={200: list[ExpenseMixSchema], 422: Message})
 def get_recent_expenses(request):
     user = request.user
-    expenses = Expense.objects.filter(user=user).order_by("-date")[:10]
+    expenses = Expense.objects.filter(user=user).select_related('category').order_by("-date")[:10]
     return Status(200, [
         ExpenseMixSchema(id=e.id, merchant=e.merchant, total=float(e.total),
-                         date=e.date, category=e.category.name, receipt_id=e.receipt_id)
+                         date=e.date, category=e.category, receipt_id=e.receipt_id)
         for e in expenses
     ])

@@ -54,7 +54,7 @@ function RecentExpenses({data, loading}) {
                 <div>
                   <h2 className='text-xl'>{item.merchant}</h2>
                   <div className=''>
-                    <p className='text-text-muted'>{item.category ? item.category : "Receipt"} · {getDayString(item)}</p>
+                    <p className='text-text-muted'>{item.category.name ? item.category.name : "Receipt"} · {getDayString(item)}</p>
                   </div>
                 </div>
                 <div>

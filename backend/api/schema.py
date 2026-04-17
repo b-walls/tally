@@ -45,7 +45,7 @@ class ScanResponse(BaseModel):
 class CategorySchema(ModelSchema):
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = ["id", "name"]
 
 
 # ------- Expense ----------
@@ -54,7 +54,7 @@ class ExpenseMixSchema(Schema):
     merchant: str
     total: float
     date: date
-    category: str
+    category: CategorySchema
     receipt_id: Optional[int] = None
 
 

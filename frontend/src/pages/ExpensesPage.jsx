@@ -49,13 +49,7 @@ export default function ReceiptsPage() {
         let data = await getExpenseRange(start, end, sortStr);
 
         if (filters.category !== "All") {
-          data = data.filter((item) => {
-            if (item.category) {
-              return item.category === filters.category;
-            } else {
-              return "Receipt" === filters.category;
-            }
-          })
+          data = data.filter((item) => item.category?.name === filters.category)
         }
 
         setExpenses(data);
@@ -73,7 +67,6 @@ export default function ReceiptsPage() {
     const fetchData = async () => {
       try {
         let data = await getCategories();
-        data = [{id: null, name: "Receipt"}, ...data]
         setCategories(data);
 
       } catch (error) {
