@@ -2,7 +2,6 @@ import React, { useMemo } from 'react'
 import { Skeleton } from '../ui/skeleton';
 
 
-const COLORS = {primary: "#a78bfa", textDanger: "#f87171", text: "#f5f5f5", success: "#4ade80", textMuted: "#888888"}
 
 function Bar({item}) {
   const spent = item.spent;
@@ -47,30 +46,31 @@ function BudgetBars({data, loading}) {
   return (
     <div className='flex flex-col flex-1 bg-surface-raised border border-border rounded-lg p-4'>
       <h1 className='text-2xl mb-5'>Budget status</h1>
+      <div className="flex flex-col gap-1 flex-1 overflow-y-auto justify-evenly pr-2">
       {
-      loading ? 
-        <div className="flex flex-col gap-1 flex-1 overflow-y-auto justify-evenly">
+      loading ?
+        <>
           {Array.from({length: 7}, (_, i) => (
             <div key={i}>
               <div className='flex justify-between mb-0.5'>
-                <Skeleton className="h-3 w-[10%] rouned-xl my-1"/>
-                <Skeleton className="h-3 w-[20%] rounded-xl my-1"/>
+                <Skeleton className="h-3 w-[10%] rouned-xl my-1" style={{animationDelay: `-${i * 0.3}s`}}/>
+                <Skeleton className="h-3 w-[20%] rounded-xl my-1" style={{animationDelay: `-${i * 0.3 + 0.1}s`}}/>
               </div>
               <div className="flex-1 width-full bg-surface-raised-2 rounded-3xl mb-1 mt-1">
-                <Skeleton className="w-full h-2 rounded-3xl"/>
+                <Skeleton className="w-full h-2 rounded-3xl" style={{animationDelay: `-${i * 0.3 + 0.2}s`}}/>
               </div>
             </div>
           ))}
-        </div>
-      :
-        <div className="flex flex-col gap-1 flex-1 overflow-y-auto justify-evenly">
+        </>
+      : <>
           {extractedData.map((item, index) => (
             <div key={index}>
               <Bar item={item}/>
             </div>
           ))}
-        </div>
+        </>
       }
+      </div>
     </div>
   )
 }

@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-*uyb%+hwu7483rdt545m(3jyg&$psu0pfotb-e=352elpg#%cv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "10.22.1.19"]
 
 
 # Application definition
@@ -87,6 +87,7 @@ HEADLESS_FRONTEND_URLS = {
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
+    'http://10.22.1.19:5173',
 ]
 CORS_ALLOW_CREDENTIALS = True  # Required to send cookies cross-origin
 
@@ -94,11 +95,12 @@ CORS_ALLOW_CREDENTIALS = True  # Required to send cookies cross-origin
 # CSRF
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5173',
+    'http://10.22.1.19:5173',
 ]
 
 CSRF_COOKIE_SAMESITE = "Lax"
-CSRF_COOKIE_SECURE = False   # True in production (HTTPS only)
-CSRF_COOKIE_HTTPONLY = False # Must be False — JS needs to read it
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
 
 TEMPLATES = [
     {

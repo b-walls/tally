@@ -11,6 +11,39 @@ CATEGORY_CHOICES = [
     'Other',
 ]
 
+ICON_CHOICES = [
+    ("shopping-cart", "Shopping Cart"),
+    ("utensils", "Utensils"),
+    ("car", "Car"),
+    ("home", "Home"),
+    ("heart", "Heart"),
+    ("gamepad-2", "Gamepad"),
+    ("shirt", "Shirt"),
+    ("dumbbell", "Dumbbell"),
+    ("plane", "Plane"),
+    ("coffee", "Coffee"),
+    ("book-open", "Book"),
+    ("music", "Music"),
+    ("gift", "Gift"),
+    ("dog", "Dog"),
+    ("scissors", "Scissors"),
+    ("briefcase", "Briefcase"),
+    ("graduation-cap", "Graduation Cap"),
+    ("pill", "Pill"),
+    ("wrench", "Wrench"),
+    ("wifi", "Wifi"),
+    ("baby", "Baby"),
+    ("fuel", "Fuel"),
+    ("circle-parking", "Parking"),
+    ("bus", "Bus"),
+    ("bike", "Bike"),
+    ("tv", "TV"),
+    ("smartphone", "Smartphone"),
+    ("receipt", "Receipt"),
+    ("landmark", "Landmark"),
+    ("tag", "Tag"),
+]
+
 PERIOD_CHOICES = [
     ("weekly", "Weekly"),
     ("monthly", "Monthly"),
@@ -23,6 +56,8 @@ class UserSettings(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=50)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    color = models.CharField(max_length=7, default="#ffffff")
+    icon = models.CharField(max_length=50, choices=ICON_CHOICES, default="tag")
 
     def __str__(self):
         return f"{self.user.username}: {self.name}"

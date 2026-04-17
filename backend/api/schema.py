@@ -45,7 +45,7 @@ class ScanResponse(BaseModel):
 class CategorySchema(ModelSchema):
     class Meta:
         model = Category
-        fields = ["id", "name"]
+        fields = ["id", "name", "color", "icon"]
 
 
 # ------- Expense ----------

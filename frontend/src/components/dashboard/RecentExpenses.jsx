@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { sameDay } from '../../utils/date'
 import { Skeleton } from '../ui/skeleton'
+import CategoryIcon from '../CategoryIcon'
 
 function getDayString(item) {
 	const date = new Date(item.date + "T00:00:00");
@@ -22,7 +23,7 @@ function RecentExpenses({data, loading}) {
 
 
   return (
-    <div className='bg-surface-raised p-4 border border-border rounded-md flex flex-col'>
+    <div className='bg-surface-raised p-4 border border-border rounded-md flex flex-col flex-1 md:min-h-0'>
 			<div className='flex justify-between items-center mb-5'>
 				<h1 className='text-2xl'>Recent expenses</h1>
 				<div className='flex flex-nowrap'>
@@ -35,12 +36,16 @@ function RecentExpenses({data, loading}) {
           {Array.from({length: 3}, (_, i) => (
             <div key={i}>
               <div className={`flex justify-between bg-surface-raised-2 items-center py-2 px-3 rounded-md ${i == 0 ? null : "mt-2"}`}>
-                <div>
-                  <Skeleton className='h-5 w-32 mb-2 mt-1'/>
-                  <Skeleton className="h-3 w-24 my-1"/>
+                <div className='flex items-center gap-3'>
+                  <Skeleton className="h-10 w-[42px]" style={{animationDelay: `-${i * 0.4}s`}}/>
+                  <div>
+                    <Skeleton className='h-5 w-32 mb-2 mt-1' style={{animationDelay: `-${i * 0.4 + 0.1}s`}}/>
+                    <Skeleton className="h-3 w-24 my-1" style={{animationDelay: `-${i * 0.4 + 0.2}s`}}/>
+                  </div>
                 </div>
-                <div>
-                  <Skeleton className="h-5 w-16"/>
+                <div className='flex flex-col items-end'>
+                  <Skeleton className="h-3 w-16 my-1" style={{animationDelay: `-${i * 0.4 + 0.3}s`}}/>
+                  <Skeleton className="h-3 w-10 my-1" style={{animationDelay: `-${i * 0.4 + 0.4}s`}}/>
                 </div>
               </div>
             </div>
@@ -51,14 +56,19 @@ function RecentExpenses({data, loading}) {
           {data.map((item, index) => (
             <div key={index}>
               <div className={`flex justify-between bg-surface-raised-2 items-center py-2 px-3 rounded-md ${index == 0 ? null : "mt-2"}`}>
-                <div>
-                  <h2 className='text-xl'>{item.merchant}</h2>
-                  <div className=''>
-                    <p className='text-text-muted'>{item.category.name ? item.category.name : "Receipt"} · {getDayString(item)}</p>
+                <div className='flex items-center gap-3'>
+                  <CategoryIcon category={item.category}/>
+                  <div>
+                    <h2 className='text-xl'>{item.merchant}</h2>
+                    <div className='flex items-center gap-px ml-0.5'>
+                      <span className='inline-block rounded-full w-2 h-2 shrink-0 mr-1' style={{backgroundColor: item.category.color}}/>
+                      <p className='text-text-muted'>{item.category.name ? item.category.name : "Receipt"}</p>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <p className='text-lg'>-${item.total}</p>
+                <div className='flex flex-col items-end'>
+                  <p className='text-lg text-danger'>-${item.total}</p>
+                   <p className='text-text-muted'>{getDayString(item)}</p>
                 </div>
               </div>
             </div>

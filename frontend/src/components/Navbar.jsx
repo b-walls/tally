@@ -1,4 +1,4 @@
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from "../contexts/AuthContext"
 import { House, Landmark, Wallet, BarChart3, Settings, LayoutDashboard } from 'lucide-react'
 
@@ -33,7 +33,18 @@ function NavLinkRow({ to, text, selected, icon: Icon }) {
 
 function Navbar() {
     const currSelected = useLocation().pathname;
-    const { user } = useAuth()
+    const navigate = useNavigate();
+    const { user, logout } = useAuth()
+
+    const handleLogout = async () => {
+        try {
+            await logout()
+            navigate('/login');
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
 
     return (
         <>
@@ -57,14 +68,14 @@ function Navbar() {
 
             <div>
                 <hr className='text-border'/>
-                <Link to="/settings" className='lg:px-4 pt-5 flex flex-row gap-4'>
+                <Link to="/settings" className='lg:px-4 pt-5 flex flex-row gap-4' onClick={handleLogout}>
                     <div className='rounded-full bg-surface-raised w-10 h-10 p-2 flex justify-center items-center'>
-                        { user ? <>{user.first_name[0]}{user.last_name[0]}</> : <>G</>}
+                        { user.first_name && user.last_name ? <>{user.first_name[0]}{user.last_name[0]}</> : <>G</>}
                         
                     </div>
                     <div className='hidden lg:block'>
                         <h2>
-                            { user ? <>{user.first_name} {user.last_name[0]}.</> : <>Guest</>}
+                            { user.first_name && user.last_name ? <>{user.first_name} {user.last_name[0]}.</> : <>Guest</>}
                         </h2>
                         <div className="flex flex-row items-center gap-1">
                             <Settings size={16} className='text-text-muted'/> <p className='text-text-muted'>Settings</p>

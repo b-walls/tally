@@ -11,7 +11,7 @@ export const login = async (email, password) => {
 }
 
 export const logout = async () => {
-    const { data } = await client.delete('/_allauth/browser/v1/auth/session')
+  await client.delete('/_allauth/browser/v1/auth/session')
 }
 
 export const register = async (email, password, firstName, lastName) => {

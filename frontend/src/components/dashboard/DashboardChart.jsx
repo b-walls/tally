@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts"
 import { sameDay } from "@/utils/date"
 import { Skeleton } from "../ui/skeleton"
@@ -75,8 +75,6 @@ const chartConfig = {
   },
 }
 
-const [rangeStart, rangeEnd] = ["Apr 2nd", "Apr 20th"]
-
 export function DashboardChart( {weekData, monthData, loading} ) {
   const [view, setView] = useState('week');
 
@@ -98,7 +96,7 @@ export function DashboardChart( {weekData, monthData, loading} ) {
         <div className="flex justify-between">
           <div>
             <h1 className='text-2xl'>Daily spending</h1>
-            <Skeleton className='w-[100%] h-4 mt-3'/>
+            <Skeleton className='w-full h-4 mt-3'/>
           </div>
       
           <div
@@ -178,7 +176,7 @@ export function DashboardChart( {weekData, monthData, loading} ) {
           </div>
         </div>
       </div>
-      <ChartContainer config={chartConfig} className="flex-1">
+      <ChartContainer config={chartConfig} className="flex-1 max-h-[80%]">
         {view == 'week' ?
         <BarChart
           accessibilityLayer
@@ -231,7 +229,7 @@ export function DashboardChart( {weekData, monthData, loading} ) {
               defaultIndex={1}
               content={
                 <ChartTooltipContent
-                  formatter={(value, name) => (
+                  formatter={(value) => (
                     <div className="flex flex-1 justify-between leading-none items-center">
                       <span className="text-muted-foreground">Spent</span>
                       <span className="font-mono font-medium tabular-nums">${value.toFixed(2)}</span>

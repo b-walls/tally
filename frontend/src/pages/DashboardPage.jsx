@@ -72,7 +72,7 @@ function DashboardPage() {
   }, [])
 
   return (
-    <div className="bg-surface min-h-full p-5 md:p-10 flex flex-col select-none">
+    <div className="bg-surface h-full p-2 md:p-5 flex flex-col select-none overflow-y-auto md:overflow-hidden">
       <div className="flex justify-between gap-2 flex-wrap items-center md:mb-2">
         <div>
           <h1 className="text-xl">{greeting}, {user.first_name}</h1>
@@ -92,7 +92,7 @@ function DashboardPage() {
           <Plus/>Log expense
         </Link>
       </div>
-      <div className="flex flex-col md:flex-row gap-3 mb-3">
+      <div className="flex flex-col md:flex-row gap-3 mb-3 md:max-h-72.5">
         <DashboardChart weekData={expenseWeekRangeData} monthData={expenseMonthRangeData} loading={loading}/>
         <BudgetStatus data={remaingBudgetData} loading={loading}/>
       </div>

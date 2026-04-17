@@ -49,31 +49,31 @@ function BudgetOverview({ data, loading }) {
       <div className='gap-3 my-3 md:flex flex-wrap mb-6 md:mb-3'>
       <div className="flex-col border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm hidden md:flex justify-evenly">
         <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Budget health</h2></div>
-        <Skeleton className='h-12 my-1 w-[40%] rounded-xl'/>
-        <Skeleton className='h-4 w-[30%] rounded-xl my-1'/>
-        <Skeleton className='flex flex-1 min-h-2 max-h-2 my-2 rounded-md overflow-clip'/>
-        <Skeleton className='h-4 w-[50%] rounded-xl my-1'/>
+        <Skeleton className='h-10 my-2 w-[40%] rounded-xl' style={{animationDelay: "-0.0s"}}/>
+        <Skeleton className='h-4 w-[30%] rounded-xl my-1' style={{animationDelay: "-0.3s"}}/>
+        <Skeleton className='flex flex-1 min-h-2 max-h-2 my-2 rounded-md overflow-clip' style={{animationDelay: "-0.6s"}}/>
+        <Skeleton className='h-4 w-[50%] rounded-xl my-1' style={{animationDelay: "-0.9s"}}/>
       </div>
 
       <div className="flex flex-col border-t-accent-2 border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm justify-evenly">
         <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Weekly Budgets</h2><span className='bg-accent-2-muted rounded-lg text-accent-2 px-2 max-h-6'>wkly</span></div>
-        <Skeleton className='h-12 my-1 w-[40%] rounded-xl'/>
-        <Skeleton className='h-4 w-[30%] rounded-xl my-1'/>
-        <Skeleton className='flex flex-1 min-h-2 max-h-2 my-2 rounded-md overflow-clip'/>
+        <Skeleton className='h-10 my-2 w-[40%] rounded-xl' style={{animationDelay: "-0.2s"}}/>
+        <Skeleton className='h-4 w-[30%] rounded-xl my-1' style={{animationDelay: "-0.5s"}}/>
+        <Skeleton className='flex flex-1 min-h-2 max-h-2 my-2 rounded-md overflow-clip' style={{animationDelay: "-0.8s"}}/>
         <div className='flex justify-between'>
-          <Skeleton className='h-4 w-[30%] rounded-xl my-1'/>
-          <Skeleton className='h-4 w-[20%] rounded-xl my-1'/>
+          <Skeleton className='h-4 w-[30%] rounded-xl my-1' style={{animationDelay: "-1.1s"}}/>
+          <Skeleton className='h-4 w-[20%] rounded-xl my-1' style={{animationDelay: "-1.4s"}}/>
         </div>
       </div>
 
       <div className="flex flex-col border-t-accent border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm justify-evenly mt-2 md:mt-0">
         <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Monthly Budgets</h2><span className='bg-accent-muted rounded-lg text-accent px-2 max-h-6'>mo</span></div>
-        <Skeleton className='h-12 my-1 w-[40%] rounded-xl'/>
-        <Skeleton className='h-4 w-[30%] rounded-xl my-1'/>
-        <Skeleton className='flex flex-1 min-h-2 max-h-2 my-2 rounded-md overflow-clip'/>
+        <Skeleton className='h-10 my-2 w-[40%] rounded-xl' style={{animationDelay: "-0.3s"}}/>
+        <Skeleton className='h-4 w-[30%] rounded-xl my-1' style={{animationDelay: "-0.7s"}}/>
+        <Skeleton className='flex flex-1 min-h-2 max-h-2 my-2 rounded-md overflow-clip' style={{animationDelay: "-1.0s"}}/>
         <div className='flex justify-between'>
-          <Skeleton className='h-4 w-[30%] rounded-xl my-1'/>
-          <Skeleton className='h-4 w-[20%] rounded-xl my-1'/>
+          <Skeleton className='h-4 w-[30%] rounded-xl my-1' style={{animationDelay: "-1.3s"}}/>
+          <Skeleton className='h-4 w-[20%] rounded-xl my-1' style={{animationDelay: "-1.6s"}}/>
         </div>
       </div>
     </div>
