@@ -59,6 +59,7 @@ function DashboardPage() {
         setExpenseWeekRangeData({startDate: startOfWeek, endDate: endOfWeek, data: expensesWeekRange});
         setExpenseMonthRangeData({startDate: startOfMonth, endDate: endOfMonth, data: expensesMonthRange});
         setExpenseRecentData(expensesRecent);
+        console.log(expensesRecent);
       } catch (error) {
         console.error(error);
       } finally {

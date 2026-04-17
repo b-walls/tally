@@ -1,4 +1,4 @@
-import { Link, createSearchParams } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { Scan, Plus, SparkleIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { getCategories } from "../api/category";

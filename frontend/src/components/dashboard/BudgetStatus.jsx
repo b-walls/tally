@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import { Skeleton } from '../ui/skeleton';
 
 
 const COLORS = {primary: "#a78bfa", textDanger: "#f87171", text: "#f5f5f5", success: "#4ade80", textMuted: "#888888"}
@@ -48,12 +49,23 @@ function BudgetBars({data, loading}) {
       <h1 className='text-2xl mb-5'>Budget status</h1>
       {
       loading ? 
-        <p>loading...</p> 
+        <div className="flex flex-col gap-1 flex-1 overflow-y-auto justify-evenly">
+          {Array.from({length: 7}, (_, i) => (
+            <div key={i}>
+              <div className='flex justify-between mb-0.5'>
+                <Skeleton className="h-3 w-[10%] rouned-xl my-1"/>
+                <Skeleton className="h-3 w-[20%] rounded-xl my-1"/>
+              </div>
+              <div className="flex-1 width-full bg-surface-raised-2 rounded-3xl mb-1 mt-1">
+                <Skeleton className="w-full h-2 rounded-3xl"/>
+              </div>
+            </div>
+          ))}
+        </div>
       :
         <div className="flex flex-col gap-1 flex-1 overflow-y-auto justify-evenly">
           {extractedData.map((item, index) => (
             <div key={index}>
-              {console.log(item)}
               <Bar item={item}/>
             </div>
           ))}

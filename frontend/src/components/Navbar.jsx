@@ -2,7 +2,6 @@ import { useLocation, Link } from 'react-router-dom';
 import { useAuth } from "../contexts/AuthContext"
 import { House, Landmark, Wallet, BarChart3, Settings, LayoutDashboard } from 'lucide-react'
 
-import tally_icon_32 from "../assets/tally_icon_32.svg"
 
 function NavLinkCol({ to, text, selected, icon: Icon }) {
     return selected ? (
@@ -60,10 +59,13 @@ function Navbar() {
                 <hr className='text-border'/>
                 <Link to="/settings" className='lg:px-4 pt-5 flex flex-row gap-4'>
                     <div className='rounded-full bg-surface-raised w-10 h-10 p-2 flex justify-center items-center'>
-                        {user.first_name[0]}{user.last_name[0]}
+                        { user ? <>{user.first_name[0]}{user.last_name[0]}</> : <>G</>}
+                        
                     </div>
                     <div className='hidden lg:block'>
-                        <h2>{user.first_name} {user.last_name[0]}.</h2>
+                        <h2>
+                            { user ? <>{user.first_name} {user.last_name[0]}.</> : <>Guest</>}
+                        </h2>
                         <div className="flex flex-row items-center gap-1">
                             <Settings size={16} className='text-text-muted'/> <p className='text-text-muted'>Settings</p>
                         </div>

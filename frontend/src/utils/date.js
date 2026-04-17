@@ -25,7 +25,6 @@ export function getWeekRange() {
   const endOfWeek = new Date(startOfWeek);
   endOfWeek.setDate(endOfWeek.getDate() + 6);
 
-  console.log(startOfWeek, endOfWeek);
   return [startOfWeek, endOfWeek]
 }
 

@@ -114,7 +114,7 @@ export function DashboardChart( {weekData, monthData, loading} ) {
             </div>
           </div>
         </div>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer config={chartConfig} className="flex-1">
           <BarChart
             accessibilityLayer
             data={[]}
@@ -178,7 +178,7 @@ export function DashboardChart( {weekData, monthData, loading} ) {
           </div>
         </div>
       </div>
-      <ChartContainer config={chartConfig}>
+      <ChartContainer config={chartConfig} className="flex-1">
         {view == 'week' ?
         <BarChart
           accessibilityLayer

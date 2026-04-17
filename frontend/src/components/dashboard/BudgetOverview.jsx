@@ -1,9 +1,5 @@
-import React, {useEffect, useMemo, useState} from 'react'
+import React, {useMemo} from 'react'
 import { Skeleton } from "@/components/ui/skeleton"
-
-const now = new Date();
-const firstDayNextMonth = new Date(now.getFullYear(), (now.getMonth() + 1 % 12), 1)
-const tilNextMonth = Math.floor((firstDayNextMonth - now) / 1000 / 60 / 60 / 24)
 
 function getBudgetData(data, period) {
   const budgets = data.filter((item) => item.period === period && item.limit > 0);
@@ -19,53 +15,65 @@ function getBudgetData(data, period) {
 }
 
 function getBudgetHealth(data) {
-  
+  const total = data.filter((item) => (item.limit > 0)).length;
+  const onTrack = data.filter((item) => (item.spent < item.limit)).length;
+  const ratio = onTrack / total;
+
+  let health = "";
+  let color = "00d4aa";
+  let infoStr = "";
+  if (ratio == 1) {
+    health = "Good"
+    color = "#00d4aa"
+    infoStr = `${total} on track`
+  } else if (ratio > 0.5) {
+    health = "At risk"
+    color = "#fbbf24"
+    infoStr = `${total} on track · ${total - onTrack} over`
+  } else {
+    health = "Bad"
+    color = "#f87171"
+    infoStr = `${total} on track · ${total - onTrack} over`
+  }
+  return {health: health, onTrack: onTrack, total: total, ratio: ratio, color: color, infoStr: infoStr}
 }
 
+
 function BudgetOverview({ data, loading }) {
-  const [localLoading, setLocalLoading] = useState(true);
+  const weeklyBudget = useMemo(() => getBudgetData(data, "weekly"), [data]);
+  const monthlyBudget = useMemo(() => getBudgetData(data, "monthly"), [data]);
+  const budgetHealth = useMemo(() => getBudgetHealth(data), [data]);
 
-  const [weeklyBudget, setWeeklyBudget] = useState([]);
-  const [monthlyBudget, setMonthlyBudget] = useState([]);
-  const [budgetHealth, setBudgetHealth] = useState([]);
-
-  useMemo(() => {
-    setWeeklyBudget(getBudgetData(data, "weekly"));
-    setMonthlyBudget(getBudgetData(data, "monthly"));
-    setBudgetHealth(getBudgetHealth(data));
-    setLocalLoading(false);
-  }, [data])
-
-  if (loading || localLoading) {
+  if (loading) {
     return (
       <div className='gap-3 my-3 md:flex flex-wrap mb-6 md:mb-3'>
       <div className="flex-col border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm hidden md:flex justify-evenly">
         <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Budget health</h2></div>
-        <Skeleton className='h-12 my-1 w-[50%] rounded-xl'/>
-        <Skeleton className='h-6 w-[50%] rounded-xl'/>
+        <Skeleton className='h-12 my-1 w-[40%] rounded-xl'/>
+        <Skeleton className='h-4 w-[30%] rounded-xl my-1'/>
         <Skeleton className='flex flex-1 min-h-2 max-h-2 my-2 rounded-md overflow-clip'/>
-        <Skeleton className='h-6 w-[50%] rounded-xl'/>
+        <Skeleton className='h-4 w-[50%] rounded-xl my-1'/>
       </div>
 
       <div className="flex flex-col border-t-accent-2 border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm justify-evenly">
         <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Weekly Budgets</h2><span className='bg-accent-2-muted rounded-lg text-accent-2 px-2 max-h-6'>wkly</span></div>
-        <Skeleton className='h-12 my-1 w-[50%] rounded-xl'/>
-        <Skeleton className='h-6 w-[50%] rounded-xl'/>
+        <Skeleton className='h-12 my-1 w-[40%] rounded-xl'/>
+        <Skeleton className='h-4 w-[30%] rounded-xl my-1'/>
         <Skeleton className='flex flex-1 min-h-2 max-h-2 my-2 rounded-md overflow-clip'/>
         <div className='flex justify-between'>
-          <Skeleton className='h-6 w-[30%] rounded-xl'/>
-          <Skeleton className='h-6 w-[30%] rounded-xl'/>
+          <Skeleton className='h-4 w-[30%] rounded-xl my-1'/>
+          <Skeleton className='h-4 w-[20%] rounded-xl my-1'/>
         </div>
       </div>
 
       <div className="flex flex-col border-t-accent border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm justify-evenly mt-2 md:mt-0">
         <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Monthly Budgets</h2><span className='bg-accent-muted rounded-lg text-accent px-2 max-h-6'>mo</span></div>
-        <Skeleton className='h-12 my-1 w-[50%] rounded-xl'/>
-        <Skeleton className='h-6 w-[50%] rounded-xl'/>
+        <Skeleton className='h-12 my-1 w-[40%] rounded-xl'/>
+        <Skeleton className='h-4 w-[30%] rounded-xl my-1'/>
         <Skeleton className='flex flex-1 min-h-2 max-h-2 my-2 rounded-md overflow-clip'/>
         <div className='flex justify-between'>
-          <Skeleton className='h-6 w-[30%] rounded-xl'/>
-          <Skeleton className='h-6 w-[30%] rounded-xl'/>
+          <Skeleton className='h-4 w-[30%] rounded-xl my-1'/>
+          <Skeleton className='h-4 w-[20%] rounded-xl my-1'/>
         </div>
       </div>
     </div>
@@ -74,14 +82,21 @@ function BudgetOverview({ data, loading }) {
 
   return (
     <div className='gap-3 my-3 md:flex flex-wrap mb-6 md:mb-3'>
-      <div className="flex-col border-t-primary border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm hidden md:flex justify-evenly">
+      <div className="flex-col border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm hidden md:flex justify-evenly"
+        style={{borderTopColor: budgetHealth.color}}
+      >
         <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Budget health</h2></div>
-        <h1 className='text-5xl py-1 text-primary'>Good</h1>
-        <p className='text-text-muted'>3 on track · 1 over</p>
+        <h1 className='text-5xl py-1'
+          style={{color: budgetHealth.color}}
+        >
+          {budgetHealth.health}
+        </h1>
+        <p className='text-text-muted'>{budgetHealth.infoStr}</p>
         <div className='flex flex-1 min-h-2 max-h-2 bg-surface-raised-2 my-2 rounded-md overflow-clip'>
-          <div className='bg-primary rounded-md' style={{width: "72%"}}></div>
+          <div className='bg-primary rounded-md' 
+          style={{width: (budgetHealth.ratio * 100) + "%", backgroundColor: budgetHealth.color}}/>
         </div>
-        <div className='flex justify-between flex-wrap'><p className='text-text-muted'>72% of budgets healthy</p></div>
+        <div className='flex justify-between flex-wrap'><p className='text-text-muted'>{budgetHealth.ratio * 100}% of budgets healthy</p></div>
       </div>
 
       <div className="flex flex-col border-t-accent-2 border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm justify-evenly">
