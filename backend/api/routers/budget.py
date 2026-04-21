@@ -35,19 +35,19 @@ def get_remaining_budget(request, username: str | None = None):
     budgets = list(Budget.objects.filter(user=user).select_related('category'))
 
     period_starts = {b.period: get_period_start(b.period) for b in budgets}
-    earliest_start = min(period_starts.values())
 
-    expense_totals = {
-        row['category_id']: row['total']
+    # Query expenses per period so weekly budgets don't include older monthly expenses
+    expense_totals = {}
+    for period, start in period_starts.items():
         for row in Expense.objects.filter(
-            user=user,
-            date__range=(earliest_start, today),
-        ).values('category_id').annotate(total=Sum('total'))
-    }
+                                          user=user,
+                                          date__range=(start, today),
+                                         ).values('category_id').annotate(total=Sum('total')):
+            expense_totals[(row['category_id'], period)] = row['total']
 
     results = []
     for budget in budgets:
-        spent = expense_totals.get(budget.category_id) or 0
+        spent = expense_totals.get((budget.category_id, budget.period)) or 0
         results.append(BudgetRemainingSchema(id=budget.id,
                                              category=budget.category.name,
                                              limit=float(budget.limit),
