@@ -16,3 +16,15 @@ export const getExpenseRecent = async () => {
     const { data } = await client.get('/api/expense/recent');
     return data
 }
+
+export const createExpense = async (merchant, category_id, jsDate, total, note="") => {
+    const date = `${jsDate.getFullYear()}-${String(jsDate.getMonth() + 1).padStart(2, '0')}-${String(jsDate.getDate()).padStart(2, '0')}`
+    const { data } = await client.post('/api/expense/', {
+        merchant: merchant,
+        category_id: category_id,
+        date: date,
+        total: total,
+        note: note
+    })
+    return data;
+}
