@@ -72,3 +72,17 @@ export function getThisYearRange() {
 
   return [startOfYear, endOfYear];
 }
+
+export function getDayString(item) {
+	const date = new Date(item.date + "T00:00:00");
+	const today = new Date();
+	const yesterday = new Date(today);
+	yesterday.setDate(yesterday.getDate() - 1);
+	if (sameDay(date, today)) {
+		return "Today";
+	} else if (sameDay(date, yesterday)) {
+		return "Yesterday";
+	} else {
+		return date.toLocaleDateString('default', { month: 'short', day: 'numeric' })
+	}
+}

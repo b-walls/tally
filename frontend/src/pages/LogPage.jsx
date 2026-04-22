@@ -13,6 +13,7 @@ import {
 
 import { getCategories } from '@/api/category';
 import { createExpense } from '@/api/expense';
+import { toast } from 'sonner';
 
 import { Tag } from 'lucide-react'
 import { iconMap } from '@/utils/categoryIcons'
@@ -65,6 +66,13 @@ function LogPage() {
     e.preventDefault();
     try {
       await createExpense(fields.merchant, fields.category_id, date, parseFloat(fields.total), fields.note);
+      toast.success('Expense logged successfully!', {
+        style: {
+          background: 'var(--color-surface-raised)',
+          border: '1px solid var(--color-success)',
+          color: 'var(--color-text)',
+        },
+      });
       navigate('/expenses');
     } catch (error) {
       console.error(error);
@@ -81,13 +89,13 @@ function LogPage() {
         <form onSubmit={submitExpense} className='max-w-full flex-1 flex flex-col gap-6 pb-10'>
           <div className='w-full flex flex-col justify-start pb-10'>
             <h1 className='text-4xl'>Log an expense</h1>
-            <p className='text-text-muted uppercase py-2'>Track where your money goes</p>
+            <p className='text-text-muted py-2'>Track where your money goes</p>
           </div>
           <div className='flex gap-5 flex-wrap'>
             <div className='flex flex-col flex-1 min-w-48'>
               <label htmlFor="total" className='uppercase text-text-muted mb-1'>Amount</label>
               <div className='flex items-center bg-surface-raised border border-border rounded-md'>
-                <span className='text-primary py-3 pl-5 pr-2 text-3xl font-bold' aria-hidden="true">$</span>
+                <span className='text-primary py-3 pl-4 pr-2 text-2xl font-bold' aria-hidden="true">$</span>
                 <input
                   id="total"
                   type="text"
@@ -99,7 +107,7 @@ function LogPage() {
                     const val = e.target.value;
                     if (/^\d*\.?\d{0,2}$/.test(val)) setFields({ ...fields, total: val });
                   }}
-                  className='text-4xl py-3 flex-1 bg-transparent placeholder:text-text-muted
+                  className='text-2xl py-3 flex-1 bg-transparent placeholder:text-text-muted
                   [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
                 />
               </div>
@@ -111,7 +119,7 @@ function LogPage() {
                   <Button
                     variant="outline"
                     data-empty={!date}
-                    className="w-[212px] h-16 text-lg justify-between text-left font-normal data-[empty=true]:text-muted-foreground bg-surface-raised border-border"
+                    className="w-[212px] h-14 text-lg justify-between text-left font-normal data-[empty=true]:text-muted-foreground bg-surface-raised border-border"
                   >
                     {date ? formatDate(date) : <span>Pick a date</span>}
                     <ChevronDownIcon />

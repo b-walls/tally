@@ -1,23 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
-import { sameDay } from '../../utils/date'
 import { Skeleton } from '../ui/skeleton'
 import CategoryIcon from '../CategoryIcon'
-
-function getDayString(item) {
-	const date = new Date(item.date + "T00:00:00");
-	const today = new Date();
-	const yesterday = new Date(today);
-	yesterday.setDate(yesterday.getDate() - 1);
-	if (sameDay(date, today)) {
-		return "Today";
-	} else if (sameDay(date, yesterday)) {
-		return "Yesterday";
-	} else {
-		return date.toLocaleDateString('default', { month: 'short', day: 'numeric' })
-	}
-}
+import { getDayString } from '../../utils/date'
 
 function RecentExpenses({data, loading}) {
 

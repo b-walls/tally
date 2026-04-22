@@ -5,6 +5,9 @@ import { getCategories } from "../api/category";
 import { Search } from "lucide-react";
 import { getTodayRange, getWeekRange, getMonthRange, getLastMonthRange, getLast3MonthRange, getThisYearRange } from "../utils/date";
 import { getExpenseRange } from "../api/expense";
+import { getDayString } from "../utils/date";
+
+import CategoryIcon from "@/components/CategoryIcon";
 
 const sortOptions = [
   {groupName: "By date", options: ["Newest first", "Oldest first"]},
@@ -132,8 +135,25 @@ export default function ReceiptsPage() {
         {loading.expenses ? (
           <p>loading...</p>
         ) : (
-          expenses.map((expense, index) => (
-            <div key={index} className="bg-surface-raised-2">{expense.merchant} - ${expense.total.toFixed(2)}</div>
+          expenses.map((item, index) => (
+            <div key={index}>
+              <div className={`flex justify-between bg-surface-raised items-center py-2 px-3 rounded-md ${index == 0 ? null : "mt-2"}`}>
+                <div className='flex items-center gap-3'>
+                  <CategoryIcon category={item.category}/>
+                  <div>
+                    <h2 className='text-xl'>{item.merchant}</h2>
+                    <div className='flex items-center gap-px ml-0.5'>
+                      <span className='inline-block rounded-full w-2 h-2 shrink-0 mr-1' style={{backgroundColor: item.category.color}}/>
+                      <p className='text-text-muted'>{item.category.name ? item.category.name : "Receipt"}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className='flex flex-col items-end'>
+                  <p className='text-lg text-danger'>-${item.total}</p>
+                   <p className='text-text-muted'>{getDayString(item)}</p>
+                </div>
+              </div>
+            </div>
           ))
         )}
       </div>
