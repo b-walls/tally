@@ -4,8 +4,8 @@ from datetime import date, timedelta
 from ninja import Router, Status
 from api.auth import SessionAuth
 
-from api.models import Expense
-from api.schema import Message, ExpenseMixSchema
+from api.models import Expense, Category
+from api.schema import Message, ExpenseMixSchema, CreateExpenseSchema
 
 logger = logging.getLogger(__name__)
 
@@ -36,3 +36,20 @@ def get_recent_expenses(request):
                          date=e.date, category=e.category, receipt_id=e.receipt_id)
         for e in expenses
     ])
+    
+@expense_router.post("/", response={200: ExpenseMixSchema})
+def create_expense(request, payload: CreateExpenseSchema):
+    e = Expense.objects.create(user=request.user,
+                                     receipt=None,
+                                     merchant=payload.merchant,
+                                     category=Category.objects.get(id=payload.category_id),
+                                     date=payload.date,
+                                     total=payload.total,
+                                     note=payload.note)
+
+    return Status(200, ExpenseMixSchema(id=e.id, 
+                                        merchant=e.merchant,
+                                        total=float(e.total),
+                                        date=e.date,
+                                        category=e.category,
+                                        receipt_id=None))

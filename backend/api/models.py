@@ -75,20 +75,6 @@ class Receipt(models.Model):
             models.Index(fields=['user']),
         ]
 
-class ExpenseItem(models.Model):
-    expense = models.ForeignKey("Expense", on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT)
-    name = models.CharField(max_length=200)
-    amount = models.DecimalField(max_digits=8, decimal_places=2)
-    confirmed = models.BooleanField(default=False)
-     
-    def __str__(self):
-        return f"Item for receipt {self.receipt.id}"
-    class Meta:
-        indexes = [
-            models.Index(fields=['category']),
-        ]
-
 class Expense(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE, null=True, blank=True, default=None)

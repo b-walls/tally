@@ -74,6 +74,12 @@ class ExpenseSchema(ModelSchema):
         model = Expense
         fields = ['id', 'merchant', 'date', 'total', 'note']
 
+class CreateExpenseSchema(Schema):
+    merchant: str
+    category_id: int
+    date: date
+    total: float
+    note: str
 
 # ------- Receipts ----------
 class ReceiptSchema(ModelSchema):
