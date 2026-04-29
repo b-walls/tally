@@ -95,7 +95,7 @@ class Expense(models.Model):
 
 class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     limit = models.DecimalField(max_digits=8, decimal_places=2)
     period = models.CharField(max_length=20, choices=PERIOD_CHOICES, default="monthly")
 

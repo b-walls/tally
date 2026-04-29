@@ -24,7 +24,7 @@ const rangeToDates = {
   "This month": getMonthRange, 
   "Last month": getLastMonthRange, 
   "Last 3 months": getLast3MonthRange, 
-  "This year": getThisYearRange, 
+  "This year": getThisYearRange,
 }
 
 const sortToString = {
@@ -41,9 +41,13 @@ export default function ReceiptsPage() {
   const [filters, setFilters] = useState({range: "This month", category: "All", sort: "Newest first", search: ""});
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState({expenses: true, categories: true});
+  const [dateRangeActive, setDateRangeActive] = useState(false);
 
   useEffect(() => {
     const fetchExpenses = async () => {
+      if (filters.range === "Custom") {
+        return;
+      }
       const [start, end] = rangeToDates[filters.range]();
       const sortStr = sortToString[filters.sort];
       
@@ -64,6 +68,7 @@ export default function ReceiptsPage() {
     }
 
     fetchExpenses();
+    console.log(dateRangeActive);
   }, [filters]);
 
   useEffect(() => {
@@ -83,11 +88,11 @@ export default function ReceiptsPage() {
   }, [])
 
   return (
-    <div className="flex-1 bg-surface h-full p-5 md:p-10">
+    <div className="flex-1 bg-surface h-full p-5 md:p-10 flex flex-col">
       <div className="flex flex-wrap justify-between items-center my-3">
         <div>
           <h1 className="text-2xl">Expenses</h1>
-          {loading.expenses ? <p className="text-text-muted">loading...</p> : <p className="text-text-muted">{expenses.length} transactions {filters.range.toLowerCase()}</p>}
+          {loading.expenses ? <p className="text-text-muted">loading...</p> : <p className="text-text-muted">{expenses.length} transactions {filters.range == "Custom" ? "" : filters.range.toLowerCase()}</p>}
         </div>
         <div className="md:flex gap-2 hidden ">
           <Link to="/expenses/scan" className="border border-border bg-surface-raised rounded-lg p-3 flex gap-2 items-center transition-all duration-300 hover:bg-surface-raised-2"> <Scan/> Scan receipt</Link>
@@ -126,12 +131,22 @@ export default function ReceiptsPage() {
         {dateRangeOptions.map((range, index) => (
           <span key={index}
             className={`py-1 px-3 rounded-4xl border border-border cursor-pointer transition-all duration-350 ${range === filters.range ? "text-background bg-primary" : "bg-surface hover:bg-primary/30 hover:text-primary"}`}
-            onClick={() => {setFilters((p) => ({...p, range: range}))}}>
+            onClick={() => {
+              setFilters((p) => ({...p, range: range}))
+              setDateRangeActive(false)}}>
             {range}
           </span>
         ))}
+        <span
+          className={`py-1 px-3 rounded-4xl border border-border cursor-pointer transition-all duration-350 ${"Custom" === filters.range ? "text-background bg-primary" : "bg-surface hover:bg-primary/30 hover:text-primary"}`}
+          onClick={() => {
+            setFilters((p) => ({...p, range: "Custom"}))
+            setDateRangeActive(true)
+          }}>
+          Custom
+        </span>
       </div>
-      <div>
+      <div className="flex-1 overflow-y-scroll pr-2 mt-5">
         {loading.expenses ? (
           <p>loading...</p>
         ) : (
