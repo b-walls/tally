@@ -211,20 +211,19 @@ SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SECURE = not DEBUG  # True in production (requires HTTPS)
 
 PRODUCTION_HOST = env('PRODUCTION_HOST', default='tally.bwalls.dev')
-CUSTOM_HOST = 'tally.bwalls.dev'
 
 if env('DJANGO_ENV', default='development') == 'production':
-    ALLOWED_HOSTS = [PRODUCTION_HOST, CUSTOM_HOST]
+    ALLOWED_HOSTS = [PRODUCTION_HOST]
     # Same-domain architecture: frontend and backend share one DO domain,
     # so CORS is not needed. CSRF_TRUSTED_ORIGINS covers the session cookie.
     CORS_ALLOWED_ORIGINS = []
-    CSRF_TRUSTED_ORIGINS = [f'https://{PRODUCTION_HOST}', f'https://{CUSTOM_HOST}']
+    CSRF_TRUSTED_ORIGINS = [f'https://{PRODUCTION_HOST}']
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
     HEADLESS_FRONTEND_URLS = {
-        "account_confirm_email": f"https://{CUSTOM_HOST}/verify-email/{{key}}",
-        "account_reset_password": f"https://{CUSTOM_HOST}/reset-password",
-        "account_reset_password_from_key": f"https://{CUSTOM_HOST}/reset-password/{{key}}",
+        "account_confirm_email": f"https://{PRODUCTION_HOST}/verify-email/{{key}}",
+        "account_reset_password": f"https://{PRODUCTION_HOST}/reset-password",
+        "account_reset_password_from_key": f"https://{PRODUCTION_HOST}/reset-password/{{key}}",
     }
     # Trust the DO load balancer's forwarded headers
     USE_X_FORWARDED_HOST = True

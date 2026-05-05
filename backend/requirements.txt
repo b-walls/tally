@@ -15,3 +15,5 @@ pydantic[email]
 django-allauth[mfa,socialaccount,headless]>=65.15.1
 boto3
 django-storages
+gunicorn
+whitenoise[brotli]
