@@ -23,12 +23,12 @@ env = AutoConfig(search_path=BASE_DIR.parent)
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*uyb%+hwu7483rdt545m(3jyg&$psu0pfotb-e=352elpg#%cv'
+SECRET_KEY = env('SECRET_KEY', default='django-insecure-8(==5yr4xi#xw-zp(ib(2fe6ufj9$)wy4mz#^k(&@6+3=m61tc')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "10.22.1.19"]
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -56,6 +56,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",  # must be first
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -87,7 +88,6 @@ HEADLESS_FRONTEND_URLS = {
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
-    'http://10.22.1.19:5173',
 ]
 CORS_ALLOW_CREDENTIALS = True  # Required to send cookies cross-origin
 
@@ -95,7 +95,6 @@ CORS_ALLOW_CREDENTIALS = True  # Required to send cookies cross-origin
 # CSRF
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5173',
-    'http://10.22.1.19:5173',
 ]
 
 CSRF_COOKIE_SAMESITE = "Lax"
@@ -183,7 +182,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Media files (receipt images)
 AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
@@ -203,3 +203,38 @@ STORAGES = {
 }
 
 MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
+
+
+# Session cookie security
+SESSION_COOKIE_HTTPONLY = True 
+SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SECURE = not DEBUG  # True in production (requires HTTPS)
+
+PRODUCTION_HOST = env('PRODUCTION_HOST', default='tally.bwalls.dev')
+CUSTOM_HOST = 'tally.bwalls.dev'
+
+if env('DJANGO_ENV', default='development') == 'production':
+    ALLOWED_HOSTS = [PRODUCTION_HOST, CUSTOM_HOST]
+    # Same-domain architecture: frontend and backend share one DO domain,
+    # so CORS is not needed. CSRF_TRUSTED_ORIGINS covers the session cookie.
+    CORS_ALLOWED_ORIGINS = []
+    CSRF_TRUSTED_ORIGINS = [f'https://{PRODUCTION_HOST}', f'https://{CUSTOM_HOST}']
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    HEADLESS_FRONTEND_URLS = {
+        "account_confirm_email": f"https://{CUSTOM_HOST}/verify-email/{{key}}",
+        "account_reset_password": f"https://{CUSTOM_HOST}/reset-password",
+        "account_reset_password_from_key": f"https://{CUSTOM_HOST}/reset-password/{{key}}",
+    }
+    # Trust the DO load balancer's forwarded headers
+    USE_X_FORWARDED_HOST = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+else:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    CORS_ALLOWED_ORIGINS = ['http://localhost:5173']
+    CSRF_TRUSTED_ORIGINS = ['http://localhost:5173']
+    HEADLESS_FRONTEND_URLS = {
+        "account_confirm_email": "http://localhost:5173/verify-email/{key}",
+        "account_reset_password": "http://localhost:5173/reset-password",
+        "account_reset_password_from_key": "http://localhost:5173/reset-password/{key}",
+    }
