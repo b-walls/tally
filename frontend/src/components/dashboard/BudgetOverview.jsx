@@ -96,7 +96,7 @@ function BudgetOverview({ data, loading }) {
           <div className='bg-primary rounded-md' 
           style={{width: (budgetHealth.ratio * 100) + "%", backgroundColor: budgetHealth.color}}/>
         </div>
-        <div className='flex justify-between flex-wrap'><p className='text-text-muted'>{budgetHealth.ratio * 100}% of budgets healthy</p></div>
+        <div className='flex justify-between flex-wrap'><p className='text-text-muted'>{(budgetHealth.ratio * 100).toFixed(2)}% of budgets healthy</p></div>
       </div>
 
       <div className="flex flex-col border-t-accent-2 border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm justify-evenly">
