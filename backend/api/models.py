@@ -2,13 +2,13 @@ from django.db import models
 from django.contrib.auth.models import User
 
 CATEGORY_CHOICES = [
-    'Groceries',
-    'Dining',
-    'Transport',
-    'Shopping',
-    'Health',
-    'Entertainment',
-    'Other',
+    {'name': 'Groceries', 'color': '#4ade80', 'icon': 'shopping-cart'},
+    {'name': 'Dining', 'color': '#fb923c', 'icon': 'utensils'},
+    {'name': 'Transport', 'color': '#38bdf8', 'icon': 'bus'},
+    {'name': 'Shopping', 'color': '#f472b6', 'icon': 'gift'},
+    {'name': 'Health', 'color': '#00d4aa', 'icon': 'heart'},
+    {'name': 'Entertainment', 'color': '#a78bfa', 'icon': 'tv'},
+    {'name': 'Other', 'color': '#8896b3', 'icon': 'tag'},
 ]
 
 ICON_CHOICES = [

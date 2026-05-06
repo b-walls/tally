@@ -31,7 +31,7 @@ def register(request, credentials: RegisterSchema):
         UserSettings.objects.create(user=user)
 
         for item in CATEGORY_CHOICES:
-            category = Category.objects.create(name=item, user=user)
+            category = Category.objects.create(user=user, name=item['name'], icon=item['icon'], color=item['color'])
             Budget.objects.create(user=user, category=category, limit=0)
 
         return Status(200, {'message': 'User created successfully'})
