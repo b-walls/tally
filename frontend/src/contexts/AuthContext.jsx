@@ -27,8 +27,8 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (username, password) => {
     await apiLogin(username, password)
     const me = await getMe()
-    setUser(me)
-    return me
+    setUser(me.data.user)
+    return me.data.user
   }, [])
 
   const logout = useCallback(async () => {
