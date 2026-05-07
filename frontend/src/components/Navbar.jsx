@@ -84,7 +84,7 @@ function Navbar() {
                 </Link>
             </div>
         </div>
-        <div className="md:hidden bg-background flex flex-row justify-evenly py-1 gap-4">
+        <div className="md:hidden bg-background flex flex-row justify-evenly py-1 gap-4 pb-4">
             <NavLinkRow to="/dashboard" text="Dashboard" icon={House} selected={currSelected === '/'}/>
             <NavLinkRow to="/expenses" text="Expenses" icon={Landmark} selected={currSelected.startsWith("/expenses")}/>
             <NavLinkRow to="/budget" text="Budget" icon={Wallet} selected={currSelected.startsWith("/budget")}/>

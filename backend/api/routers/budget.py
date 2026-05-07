@@ -49,7 +49,7 @@ def get_remaining_budget(request, username: str | None = None):
     for budget in budgets:
         spent = expense_totals.get((budget.category_id, budget.period)) or 0
         results.append(BudgetRemainingSchema(id=budget.id,
-                                             category=budget.category.name,
+                                             category=budget.category,
                                              limit=float(budget.limit),
                                              spent=spent,
                                              remaining=float(budget.limit - spent),

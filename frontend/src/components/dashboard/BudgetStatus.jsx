@@ -10,7 +10,7 @@ function Bar({item}) {
     return (
     <>
       <div className='flex justify-between mb-0.5'>
-        <p className='text-text-muted'>{item.category}</p>
+        <p className='text-text-muted'>{item.category.name}</p>
         <p className="text-text-muted">Not budgeted</p>
       </div>
       <div className="flex-1 width-full bg-surface-raised-2 rounded-3xl mb-1">
@@ -23,7 +23,7 @@ function Bar({item}) {
   return (
     <>
       <div className='flex justify-between mb-0.5'>
-        <p>{item.category}</p>
+        <p>{item.category.name}</p>
         <p className={`${item.remaining <= 0 ? "text-danger" : "text-text-muted"}`}>${spent.toFixed(2)} / ${item.limit.toFixed(2)}</p>
       </div>
       <div className="flex-1 width-full bg-surface-raised-2 rounded-3xl mb-1">

@@ -1,5 +1,7 @@
 import React, {useMemo} from 'react'
 import { Skeleton } from "@/components/ui/skeleton"
+import MonthTag from '../MonthTag';
+import WeekTag from '../WeekTag';
 
 function getBudgetData(data, period) {
   const budgets = data.filter((item) => item.period === period && item.limit > 0);
@@ -56,7 +58,7 @@ function BudgetOverview({ data, loading }) {
       </div>
 
       <div className="flex flex-col border-t-accent-2 border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm justify-evenly">
-        <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Weekly Budgets</h2><span className='bg-accent-2-muted rounded-lg text-accent-2 px-2 max-h-6'>wkly</span></div>
+        <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Weekly Budgets</h2><WeekTag /></div>
         <Skeleton className='h-10 my-2 w-[40%] rounded-xl' style={{animationDelay: "-0.2s"}}/>
         <Skeleton className='h-4 w-[30%] rounded-xl my-1' style={{animationDelay: "-0.5s"}}/>
         <Skeleton className='flex flex-1 min-h-2 max-h-2 my-2 rounded-md overflow-clip' style={{animationDelay: "-0.8s"}}/>
@@ -67,7 +69,7 @@ function BudgetOverview({ data, loading }) {
       </div>
 
       <div className="flex flex-col border-t-accent border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm justify-evenly mt-2 md:mt-0">
-        <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Monthly Budgets</h2><span className='bg-accent-muted rounded-lg text-accent px-2 max-h-6'>mo</span></div>
+        <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Monthly Budgets</h2><MonthTag /></div>
         <Skeleton className='h-10 my-2 w-[40%] rounded-xl' style={{animationDelay: "-0.3s"}}/>
         <Skeleton className='h-4 w-[30%] rounded-xl my-1' style={{animationDelay: "-0.7s"}}/>
         <Skeleton className='flex flex-1 min-h-2 max-h-2 my-2 rounded-md overflow-clip' style={{animationDelay: "-1.0s"}}/>
@@ -100,7 +102,7 @@ function BudgetOverview({ data, loading }) {
       </div>
 
       <div className="flex flex-col border-t-accent-2 border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm justify-evenly">
-        <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Weekly Budgets</h2><span className='bg-accent-2-muted rounded-lg text-accent-2 px-2 max-h-6'>wkly</span></div>
+        <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Weekly Budgets</h2><WeekTag /></div>
         <h1 className='text-5xl py-1'>${weeklyBudget.spent.toFixed(2)}</h1>
         <p className='text-text-muted'>of ${weeklyBudget.limit.toFixed(2)} this week</p>
         <div className='flex flex-1 min-h-2 max-h-2 bg-surface-raised-2 my-2 rounded-md overflow-clip'>
@@ -110,7 +112,7 @@ function BudgetOverview({ data, loading }) {
       </div>
 
       <div className="flex flex-col border-t-accent border-t-3 flex-1 border border-border bg-surface-raised rounded-lg p-5 shadow-sm justify-evenly mt-2 md:mt-0">
-        <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Monthly Budgets</h2><span className='bg-accent-muted rounded-lg text-accent px-2 max-h-6'>mo</span></div>
+        <div className='flex gap-2'><h2 className='uppercase text-text-muted'>Monthly Budgets</h2><MonthTag /></div>
         <h1 className='text-5xl py-1'>${monthlyBudget.spent}</h1>
         <p className='text-text-muted'>of ${monthlyBudget.limit} this month</p>
         <div className='flex flex-1 min-h-2 max-h-2 bg-surface-raised-2 my-2 rounded-md overflow-clip'>

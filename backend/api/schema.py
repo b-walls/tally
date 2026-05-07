@@ -110,7 +110,7 @@ class GetBudgetSchema(ModelSchema):
 
 class BudgetRemainingSchema(Schema):
     id: int
-    category: str
+    category: CategorySchema
     limit: float
     remaining: float
     spent: float
