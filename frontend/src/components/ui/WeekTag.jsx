@@ -1,6 +1,6 @@
-function WeekTag({border=false}) {
+function WeekTag({children, border=false, rounded="rounded-lg"}) {
   return (
-    <span className={`bg-accent-2-muted rounded-lg text-accent-2 px-2 max-h-6 ${border ? "border border-accent-2 py-1" : ""}`}>wkly</span>
+    <span className={`bg-accent-2-muted text-accent-2 px-2 max-h-6 ${border ? "border border-accent-2 py-1" : ""} ${rounded}`}>{children}</span>
   )
 }
 

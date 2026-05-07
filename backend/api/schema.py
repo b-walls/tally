@@ -97,11 +97,7 @@ class ScanResultSchema(Schema):
 
 # ------- Budget ----------
 class GetBudgetSchema(ModelSchema):
-    category: str
-
-    @staticmethod
-    def resolve_category(obj):
-        return obj.category.name
+    category: CategorySchema
 
     class Meta:
         model = Budget
@@ -118,5 +114,8 @@ class BudgetRemainingSchema(Schema):
 
 
 class UpdateBudgetSchema(Schema):
-    limit: float
-    period: str
+    name: Optional[str] = None
+    icon: Optional[str] = None
+    color: Optional[str] = None
+    limit: Optional[float] = None
+    period: Optional[str] = None

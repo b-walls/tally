@@ -7,6 +7,7 @@ from api.auth import SessionAuth
 
 from django.contrib.auth.models import User
 from django.db.models import Sum
+from django.shortcuts import get_object_or_404
 
 from api.models import Budget, Expense
 from api.schema import GetBudgetSchema, BudgetRemainingSchema, UpdateBudgetSchema, Message
@@ -75,16 +76,37 @@ def get_budgets(request, username: str | None = None):
 def update_budget(request, id: int, payload: UpdateBudgetSchema):
     """Gets a budget by id"""
     user = request.user
-    budget = Budget.objects.get(id=id)
+    budget = get_object_or_404(Budget, id=id)
+    category = budget.category
 
     if not (budget.user == user or user.is_superuser):
         return Status(403, "Unauthorized")
 
-    if budget.limit is not None:
+    budget_changed = False
+    category_changed = False
+    
+    # Budget stuff
+    if payload.limit is not None:
         budget.limit = payload.limit
-    if budget.period is not None:
+        budget_changed = True
+    if payload.period is not None:
         budget.period = payload.period
+        budget_changed = True
 
-    budget.save()
+    # Category stuff
+    if payload.icon is not None:
+        category.icon = payload.icon
+        category_changed = True
+    if payload.color is not None:
+        category.color = payload.color
+        category_changed = True
+    if payload.name is not None:
+        category.name = payload.name
+        category_changed = True
+    
+    if budget_changed:
+        budget.save()
+    if category_changed:
+        category.save()
 
     return Status(200, budget)

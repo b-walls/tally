@@ -1,6 +1,6 @@
-function MonthTag({border=false}) {
+function MonthTag({children, border=false, rounded="rounded-lg"}) {
   return (
-    <span className={`bg-accent-muted rounded-lg text-accent px-2 max-h-6 ${border ? "border border-accent py-1" : ""}`}>mo</span>
+    <span className={`bg-accent-muted text-accent px-2 max-h-6 ${border ? "border border-accent py-1" : ""} ${rounded}`}>{children}</span>
   )
 }
 
