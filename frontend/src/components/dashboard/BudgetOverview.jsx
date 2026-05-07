@@ -1,7 +1,7 @@
 import React, {useMemo} from 'react'
 import { Skeleton } from "@/components/ui/skeleton"
-import MonthTag from '../MonthTag';
-import WeekTag from '../WeekTag';
+import MonthTag from '../ui/MonthTag';
+import WeekTag from '../ui/WeekTag';
 
 function getBudgetData(data, period) {
   const budgets = data.filter((item) => item.period === period && item.limit > 0);

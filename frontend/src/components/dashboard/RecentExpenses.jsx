@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { Skeleton } from '../ui/skeleton'
-import CategoryIcon from '../CategoryIcon'
+import CategoryIcon from '../ui/CategoryIcon'
 import { getDayString } from '../../utils/date'
 
 function RecentExpenses({data, loading}) {

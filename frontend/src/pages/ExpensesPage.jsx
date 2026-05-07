@@ -7,7 +7,7 @@ import { getTodayRange, getWeekRange, getMonthRange, getLastMonthRange, getLast3
 import { getExpenseRange } from "../api/expense";
 import { getDayString } from "../utils/date";
 
-import CategoryIcon from "@/components/CategoryIcon";
+import CategoryIcon from "@/components/ui/CategoryIcon";
 
 const sortOptions = [
   {groupName: "By date", options: ["Newest first", "Oldest first"]},

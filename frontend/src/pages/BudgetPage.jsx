@@ -1,9 +1,9 @@
 import { getRemaining } from "@/api/budget";
 import { useEffect, useState } from "react";
 
-import CategoryIcon from "@/components/CategoryIcon";
-import MonthTag from "@/components/MonthTag";
-import WeekTag from "@/components/WeekTag";
+import CategoryIcon from "@/components/ui/CategoryIcon";
+import MonthTag from "@/components/ui/MonthTag";
+import WeekTag from "@/components/ui/WeekTag";
 
 const headerStyle = "text-start py-2 uppercase text-text-muted text-sm font-semibold"
 
