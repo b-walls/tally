@@ -41,7 +41,7 @@ export default function App() {
         </Route>
 
         {/* ── Dev only ─────────────────────────────────────────────────── */}
-        <Route path="/palette" element={<PalettePage />} />
+        {/* <Route path="/palette" element={<PalettePage />} /> */}
 
         {/* ── Fallback ─────────────────────────────────────────────────── */}
         <Route path="*" element={<Navigate to="/" replace />} />

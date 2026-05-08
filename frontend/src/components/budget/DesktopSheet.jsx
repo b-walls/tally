@@ -71,7 +71,7 @@ export function DesktopSheet({children, budget, onSave}) {
       <SheetTrigger asChild>
         <Button variant="outline" className="bg-transparent cursor-pointer shadow-lg">{children}</Button>
       </SheetTrigger>
-      <SheetContent className="bg-background border-l border-l-border overflow-y-auto w-full sm:max-w-sm">
+      <SheetContent className="bg-background border-l border-l-border overflow-y-auto w-full sm:max-w-sm" onOpenAutoFocus={e => e.preventDefault()}>
         <SheetHeader>
           <SheetTitle>Edit {budget.category.name}</SheetTitle>
           <SheetDescription>

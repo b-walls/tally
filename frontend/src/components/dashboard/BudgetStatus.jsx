@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Skeleton } from '../ui/skeleton';
-
-
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 
 function Bar({item}) {
   const spent = item.spent;
@@ -45,7 +45,12 @@ function BudgetBars({data, loading}) {
   
   return (
     <div className='flex flex-col flex-1 bg-surface-raised border border-border rounded-lg p-4'>
-      <h1 className='text-2xl mb-5'>Budget status</h1>
+      <div className='flex justify-between items-center mb-5'>
+        <h1 className='text-2xl'>Budget status</h1>
+        <div className='flex flex-nowrap'>
+          <Link to="/budget" className='text-primary flex gap-2 hover:underline'>Adjust<ArrowRight /></Link>
+        </div>
+      </div>
       <div className="flex flex-col gap-1 flex-1 overflow-y-auto justify-evenly pr-2">
       {
       loading ?

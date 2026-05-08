@@ -56,33 +56,28 @@ export default function BudgetPage() {
         <span className="text-nowrap">{unbudgetedData.length} unbudgeted</span>
       </p>  
     </div>
-    <div className="border border-border bg-surface-raised rounded-lg overflow-clip shadow-md">
+    <div className="border border-border bg-surface-raised rounded-lg overflow-clip shadow-md hidden sm:block">
       <table className="table-auto w-full">
         <thead>
           <tr className="bg-surface border-b border-border shadow-lg">
             <th className={headerStyle + " pl-4 hidden sm:block text-start"}>Category</th>
             <th className={headerStyle + " pl-4 sm:hidden text-start"}>Cat</th>
-            <th className={headerStyle + " text-start"}>Limit</th>
-            <th className={headerStyle + " text-start"}>Period</th>
+            <th className={headerStyle + " text-start pl-2"}>Period</th>
             <th className={headerStyle + " text-center"}>Used</th>
           </tr>
         </thead>
 
         <tbody>
           {budgetedData.map((budget, index) => 
-            budget.limit > 0 ? (
               <tr 
                 className={`border-t-border even:bg-surface-raised-2/60 ${index == 0 ? "" : 'border-t border-t-border'}`}
                 key={budget.id}
               >
-                <td className="px-4">
+                <td className="pl-4 pr-2">
                   <div className="flex items-center py-2 gap-3">
                     <CategoryIcon category={budget.category} border={true} size={36}/>
                     <p className="hidden sm:block">{budget.category.name}</p>
                   </div>
-                </td>
-                <td className="pr-2 sm:pr-4">
-                  <p className='text-text-muted'>{`$${budget.limit}`}</p>
                 </td>
                 <td>
                   {budget.period === "monthly" ? 
@@ -109,10 +104,34 @@ export default function BudgetPage() {
                   </div>
                 </td>
               </tr>
-            ) : null
           )}
         </tbody>
       </table>
+      {budgetedData.length <= 0 ? 
+      <div className="text-center py-4">
+        <h1>No categories budgeted.</h1>
+        <p className="text-text-muted">Set limits on categories below to begin budgeting</p>
+      </div>: null}
+    </div>
+    <div className="border border-border sm:hidden rounded-md overflow-clip">
+      <div className="p-4">
+        <h1>Active budgets</h1>
+      </div>
+      {budgetedData.map((budget, index) => 
+        <div key={index} className="bg-surface-raised odd:bg-surface-raised-2/60 px-4 py-2 flex justify-between items-center gap-4">
+          <div className="flex gap-3 items-center w-full">
+            <CategoryIcon category={budget.category} size={42} border={true}/>
+            <div className="flex-1 truncate flex flex-col gap-1">
+              <h2>{budget.category.name}</h2>
+              <Bar percentFilled={Math.min(100, (budget.spent / budget.limit) * 100) + "%"} color={"bg-primary"} dangerEnabled={true} margin={false}/>
+              <span className=" text-sm mt-0.5">${budget.spent} / ${budget.limit}</span> 
+            </div>
+          </div>
+          <DesktopSheet budget={budget} onSave={fetchData}>
+            <Pencil size={16}/> Edit
+          </DesktopSheet>
+        </div>
+      )}
     </div>
     { unbudgetedData.length > 0 ?
     <div className="border-dashed border border-border w-full mt-4 rounded-md ">

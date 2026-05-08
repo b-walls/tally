@@ -13,7 +13,7 @@ function RecentExpenses({data, loading}) {
 			<div className='flex justify-between items-center mb-5'>
 				<h1 className='text-2xl'>Recent expenses</h1>
 				<div className='flex flex-nowrap'>
-					<Link to="/expenses" className='text-primary flex gap-2'>View all <ArrowRight /></Link>
+					<Link to="/expenses" className='text-primary flex gap-2 hover:underline'>View all <ArrowRight /></Link>
 				</div>
 			</div>
 			<div className='flex-1 min-h-0 overflow-y-auto max-h-55 pr-2'>
@@ -23,7 +23,7 @@ function RecentExpenses({data, loading}) {
             <div key={i}>
               <div className={`flex justify-between bg-surface-raised-2 items-center py-2 px-3 rounded-md ${i == 0 ? null : "mt-2"}`}>
                 <div className='flex items-center gap-3'>
-                  <Skeleton className="h-10 w-[42px]" style={{animationDelay: `-${i * 0.4}s`}}/>
+                  <Skeleton className="h-10 w-10.5" style={{animationDelay: `-${i * 0.4}s`}}/>
                   <div>
                     <Skeleton className='h-5 w-32 mb-2 mt-1' style={{animationDelay: `-${i * 0.4 + 0.1}s`}}/>
                     <Skeleton className="h-3 w-24 my-1" style={{animationDelay: `-${i * 0.4 + 0.2}s`}}/>
