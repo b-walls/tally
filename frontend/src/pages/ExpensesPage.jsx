@@ -90,14 +90,14 @@ export default function ReceiptsPage() {
 
   return (
     <div className="flex-1 bg-surface h-full p-5 md:p-10 flex flex-col">
-      <div className="flex flex-wrap justify-between items-center my-3">
-        <div>
+      <div className="flex flex-col md:flex-row flex-wrap justify-between md:items-center my-3">
+        <div className="mb-2">
           <h1 className="text-2xl">Expenses</h1>
           {loading.expenses ? <p className="text-text-muted">loading...</p> : <p className="text-text-muted">{expenses.filter((item) => item.merchant.includes(searchStr)).length} transactions {filters.range == "Custom" ? "" : filters.range.toLowerCase()}</p>}
         </div>
-        <div className="md:flex gap-2 hidden ">
-          <Link to="/expenses/scan" className="border border-border bg-surface-raised rounded-lg p-3 flex gap-2 items-center transition-all duration-300 hover:bg-surface-raised-2"> <Scan/> Scan receipt</Link>
-          <Link to="/expenses/log" className="border border-border bg-primary text-background rounded-lg p-3 flex gap-2 items-center transition-all duration-300 hover:bg-primary/80"> <Plus/> Log expense</Link>
+        <div className="gap-2 flex">
+          <Link to="/expenses/scan" className="border flex-1 border-border max-h-15 bg-surface-raised rounded-lg p-3 flex gap-2 items-center transition-all duration-300 hover:bg-surface-raised-2"> <Scan/> Scan receipt</Link>
+          <Link to="/expenses/log" className="border flex-1 max-h-15 border-border bg-primary text-background rounded-lg p-3 flex gap-2 items-center transition-all duration-300 hover:bg-primary/80"> <Plus/> Log expense</Link>
         </div>
       </div>
       <div className="flex flex-wrap flex-col md:flex-row gap-3">
