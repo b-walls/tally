@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 auth_router = Router()
 
 
-@auth_router.post("/register", response={200: Message, 400: Message, 409: Message, 500: Message})
+@auth_router.post("/register", response={200: Message, 400: Message, 409: Message, 500: Message}, auth=None)
 def register(request, credentials: RegisterSchema):
     try:
         validate_password(credentials.password)
@@ -27,8 +27,6 @@ def register(request, credentials: RegisterSchema):
         user.first_name = credentials.first_name
         user.last_name = credentials.last_name
         user.save()
-
-        UserSettings.objects.create(user=user)
 
         for item in CATEGORY_CHOICES:
             category = Category.objects.create(user=user, name=item['name'], icon=item['icon'], color=item['color'])
