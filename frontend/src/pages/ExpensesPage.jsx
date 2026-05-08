@@ -38,7 +38,8 @@ const sortToString = {
 
 export default function ReceiptsPage() {
   const [categories, setCategories] = useState([]);
-  const [filters, setFilters] = useState({range: "This month", category: "All", sort: "Newest first", search: ""});
+  const [filters, setFilters] = useState({range: "This month", category: "All", sort: "Newest first"});
+  const [searchStr, setSearchStr] = useState("");
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState({expenses: true, categories: true});
   const [dateRangeActive, setDateRangeActive] = useState(false);
@@ -92,7 +93,7 @@ export default function ReceiptsPage() {
       <div className="flex flex-wrap justify-between items-center my-3">
         <div>
           <h1 className="text-2xl">Expenses</h1>
-          {loading.expenses ? <p className="text-text-muted">loading...</p> : <p className="text-text-muted">{expenses.length} transactions {filters.range == "Custom" ? "" : filters.range.toLowerCase()}</p>}
+          {loading.expenses ? <p className="text-text-muted">loading...</p> : <p className="text-text-muted">{expenses.filter((item) => item.merchant.includes(searchStr)).length} transactions {filters.range == "Custom" ? "" : filters.range.toLowerCase()}</p>}
         </div>
         <div className="md:flex gap-2 hidden ">
           <Link to="/expenses/scan" className="border border-border bg-surface-raised rounded-lg p-3 flex gap-2 items-center transition-all duration-300 hover:bg-surface-raised-2"> <Scan/> Scan receipt</Link>
@@ -101,7 +102,8 @@ export default function ReceiptsPage() {
       </div>
       <div className="flex flex-wrap flex-col md:flex-row gap-3">
         <div className="bg-surface-raised border border-border p-3 rounded-md flex-1 flex gap-3">
-          <Search className="text-text-muted"/><input className="flex-1" type="text" placeholder="Search expenses..."/>
+          <Search className="text-text-muted"/>
+          <input className="flex-1" type="text" placeholder="Search expenses..." value={searchStr} onChange={(e) => setSearchStr(e.target.value)}/>
         </div>
         <div className="flex gap-3 flex-1 flex-wrap md:flex-nowrap">
           <select name="category" className="bg-surface-raised border border-border p-3 rounded-t-md rounded-b-md focus:rounded-b-none flex-1"
@@ -150,7 +152,7 @@ export default function ReceiptsPage() {
         {loading.expenses ? (
           <p>loading...</p>
         ) : (
-          expenses.map((item, index) => (
+          expenses.filter((item) => item.merchant.includes(searchStr)).map((item, index) => (
             <div key={index}>
               <div className={`flex justify-between bg-surface-raised items-center py-2 px-3 rounded-md ${index == 0 ? null : "mt-2"}`}>
                 <div className='flex items-center gap-3'>

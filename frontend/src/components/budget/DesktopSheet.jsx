@@ -40,6 +40,21 @@ export function DesktopSheet({children, budget, onSave}) {
   const [disabled, setDisabled] = useState(Number(budget.limit) <= 0)
   const [open, setOpen] = useState(false)
 
+	const handleDisable = () => {
+		if (!disabled) {
+			setDisabled(!disabled);
+			setLimit(0);
+		} else {
+			setDisabled(!disabled);
+		}
+	}
+	
+	const handleLimitChange = (e) => {
+		const val = e.target.value;
+		setDisabled(!(val > 0));
+		setLimit(val);
+	}
+
   const handleSave = async () => {
     const effectiveLimit = disabled ? 0 : limit
     try {
@@ -54,7 +69,7 @@ export function DesktopSheet({children, budget, onSave}) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" className="bg-surface cursor-pointer">{children}</Button>
+        <Button variant="outline" className="bg-transparent cursor-pointer shadow-lg">{children}</Button>
       </SheetTrigger>
       <SheetContent className="bg-background border-l border-l-border overflow-y-auto w-full sm:max-w-sm">
         <SheetHeader>
@@ -95,7 +110,7 @@ export function DesktopSheet({children, budget, onSave}) {
           <div className="grid gap-2">
             <label htmlFor="budget-limit" className={labelStyle}>Limit ($)</label>
             <input id="budget-limit" className={inputStyle} type="number" min="0" step="0.01"
-                   value={limit} onChange={e => setLimit(e.target.value)}/>
+                   value={limit} onChange={handleLimitChange}/>
           </div>
           <div className="grid gap-2">
             <label htmlFor="budget-period" className={labelStyle}>Period</label>
@@ -116,12 +131,12 @@ export function DesktopSheet({children, budget, onSave}) {
           </div>
           <div className="flex items-center gap-2">
             <label htmlFor="budget-enabled" className={labelStyle}>Enabled</label>
-            <Switch id="budget-enabled" checked={!disabled} onCheckedChange={v => setDisabled(!v)} className={"cursor-pointer"}/>
+            <Switch id="budget-enabled" checked={!disabled} onCheckedChange={handleDisable} className={"cursor-pointer"}/>
           </div>
         </div>
         <SheetFooter>
-          <Button type="button" onClick={handleSave}>Save changes</Button>
-          <SheetClose asChild>
+          <Button type="button" onClick={handleSave} className="cursor-pointer text-background">Save changes</Button>
+          <SheetClose asChild className="cursor-pointer">
             <Button variant="outline">Close</Button>
           </SheetClose>
         </SheetFooter>

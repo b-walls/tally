@@ -194,7 +194,7 @@ export function DashboardChart( {weekData, monthData, loading} ) {
             axisLine={false}
             tickFormatter={(value) => value.slice(0, 3)}
           />
-          <Bar dataKey="total" fill="var(--color-primary)" radius={8}>
+          <Bar dataKey="total" fill="var(--color-primary)" radius={4}>
             <LabelList
               position="top"
               offset={12}
